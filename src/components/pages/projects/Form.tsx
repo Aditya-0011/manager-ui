@@ -147,18 +147,18 @@ export function Form({
             <Button
               variant="ghost"
               size="icon-sm"
-              className="text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
+              className="rounded-md text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
             >
               <Edit2 className="size-4" />
             </Button>
           ) : (
-            <Button className="bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500">
+            <Button className="rounded-md bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500">
               Add
             </Button>
           )}
         </DialogTrigger>
         <DialogContent
-          className="border-white sm:max-w-200"
+          className="border border-white bg-neutral-950 sm:max-w-200"
           showCloseButton={false}
         >
           <DialogHeader className="backdrop-blur-sm">
@@ -200,7 +200,7 @@ export function Form({
                       disabled={isCreatingProject || isUpdatingProject}
                       type="text"
                       required
-                      className="focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                      className="border-input rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -223,6 +223,7 @@ export function Form({
                         variant="outline"
                         size="icon-xs"
                         onClick={() => setPreview(!preview)}
+                        className="rounded-md"
                       >
                         {preview ? (
                           <Edit2 className="size-3" />
@@ -295,7 +296,7 @@ export function Form({
                           aria-invalid={isInvalid}
                           disabled={isCreatingProject || isUpdatingProject}
                           required
-                          className="h-full min-h-30 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                          className="border-input h-full min-h-30 rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                         />
                         {isInvalid && (
                           <FieldError errors={field.state.meta.errors} />
@@ -326,7 +327,7 @@ export function Form({
                       type="url"
                       disabled={isCreatingProject || isUpdatingProject}
                       required
-                      className="focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                      className="border-input rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -355,7 +356,7 @@ export function Form({
                       disabled={isCreatingProject || isUpdatingProject}
                       type="url"
                       required
-                      className="focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                      className="border-input rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -384,7 +385,7 @@ export function Form({
                       disabled={isCreatingProject || isUpdatingProject}
                       type="url"
                       required
-                      className="focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                      className="border-input rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -433,13 +434,15 @@ export function Form({
                     >
                       <ComboboxChips
                         ref={anchor}
-                        className="w-full focus-within:border-sky-500 focus-within:ring-0 focus-within:ring-sky-500"
+                        className="border-input w-full rounded-md border bg-neutral-950 py-2 focus-within:border-sky-500 focus-within:ring-0 focus-within:ring-sky-500"
                       >
                         <ComboboxValue>
                           {(names) => (
                             <div className="flex w-full flex-wrap gap-2">
                               {names.map((name: string) => (
-                                <ComboboxChip key={name}>{name}</ComboboxChip>
+                                <ComboboxChip key={name} className="rounded-md">
+                                  {name}
+                                </ComboboxChip>
                               ))}
                               <ComboboxChipsInput />
                             </div>
@@ -447,11 +450,18 @@ export function Form({
                         </ComboboxValue>
                       </ComboboxChips>
 
-                      <ComboboxContent anchor={anchor}>
+                      <ComboboxContent
+                        anchor={anchor}
+                        className="border-input rounded-md border px-1 py-2"
+                      >
                         <ComboboxEmpty>No technology found.</ComboboxEmpty>
                         <ComboboxList className="scrollbar-thin scrollbar-thumb-neutral-900 scrollbar-track-neutral-950">
                           {(name: string) => (
-                            <ComboboxItem key={name} value={name}>
+                            <ComboboxItem
+                              key={name}
+                              value={name}
+                              className="rounded-md"
+                            >
                               {name}
                             </ComboboxItem>
                           )}
@@ -522,6 +532,7 @@ export function Form({
                   variant="outline"
                   size="default"
                   onClick={() => reset()}
+                  className="rounded-md"
                 >
                   Cancel
                 </Button>
@@ -530,7 +541,7 @@ export function Form({
                 form={formId}
                 type="submit"
                 disabled={isCreatingProject || isUpdatingProject}
-                className="bg-neutral-950 text-sky-500 hover:bg-sky-500/10 hover:text-sky-600 hover:inset-ring hover:ring-sky-500"
+                className="rounded-md bg-neutral-950 text-sky-500 hover:bg-sky-500/10 hover:text-sky-600 hover:inset-ring hover:ring-sky-500"
               >
                 Save
               </Button>

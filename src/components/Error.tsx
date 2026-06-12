@@ -1,5 +1,3 @@
-import { Link } from "react-router";
-
 import { AlertTriangle } from "lucide-react";
 
 import { Button } from "./ui/button";
@@ -26,12 +24,6 @@ export function Error({ content }: ErrorProps) {
         </p>
       </div>
       <div className="flex gap-2">
-        <Button
-          variant="outline"
-          className="border-red-500/20 bg-red-500/5 text-red-500 hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400"
-        >
-          <Link to="/health">Health</Link>
-        </Button>
         <Button
           variant="outline"
           onClick={() => {

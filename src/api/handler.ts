@@ -5,7 +5,6 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
 
 import { toast } from "sonner";
 import {
@@ -71,27 +70,30 @@ export function useDataQuery<Request, Response>(
     refetchInterval?: number;
     onSuccess?: (data: Response) => void;
     skipAuthErrorHandling?: boolean;
+    enabled?: boolean;
   },
 ) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const { logout } = useAuth();
 
   const queryResult = useQuery<Response, Error>({
     queryKey: [...key, url, app, textOnlyResponse],
     queryFn: () =>
       fetcher<Request, Response>(app, url, undefined, "GET", textOnlyResponse),
-    enabled: true,
+    enabled: options?.enabled ?? true,
     staleTime: options?.staleTime ?? 30 * 60 * 1000,
     refetchInterval: options?.refetchInterval,
     retry: (failureCount, error) => {
-      if (
-        error instanceof FetchError &&
-        (error.status === 401 || error.status === 0)
-      ) {
-        return false;
+      if (error instanceof FetchError) {
+        if (
+          error.status === 401 ||
+          error.status === 404 ||
+          error.status === 0
+        ) {
+          return false;
+        }
       }
-      return failureCount <= 3;
+      return failureCount < 3;
     },
   });
 
@@ -114,7 +116,7 @@ export function useDataQuery<Request, Response>(
           queryClient.clear();
           logout();
           toast.error(message);
-          navigate(`${CONSOLE_URL}/login?ref=Manager`, { replace: true });
+          window.location.href = `${CONSOLE_URL}/login?redirect=Manager`;
           return;
         }
       }
@@ -124,7 +126,6 @@ export function useDataQuery<Request, Response>(
     queryResult.isError,
     queryResult.error,
     queryClient,
-    navigate,
     logout,
     options?.skipAuthErrorHandling,
   ]);
@@ -142,7 +143,6 @@ export function useDataMutation<Request, Response>(
   },
 ) {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const { logout } = useAuth();
 
   return useMutation<Response, FetchError, Request>({
@@ -162,7 +162,7 @@ export function useDataMutation<Request, Response>(
           queryClient.clear();
           logout();
           toast.error(error.message);
-          navigate(`${CONSOLE_URL}/login?ref=Manager`, { replace: true });
+          window.location.href = `${CONSOLE_URL}/login?redirect=Manager`;
           return;
         }
         toast.error(error.message);

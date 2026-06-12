@@ -1,6 +1,13 @@
 import { Link } from "react-router";
 
-import { AppWindow, SquareAsterisk, LogOut } from "lucide-react";
+import {
+  User,
+  Code2,
+  FolderCode,
+  HardHat,
+  MessageSquareMore,
+  LogOut,
+} from "lucide-react";
 
 import { useDataMutation } from "@/api/handler";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,8 +33,11 @@ type navigationOptions = {
 };
 
 const items: navigationOptions[] = [
-  { title: "Apps", url: "/apps", icon: AppWindow },
-  { title: "Secrets", url: "/secrets", icon: SquareAsterisk },
+  { title: "About", url: "/about", icon: User },
+  { title: "Technologies", url: "/technologies", icon: Code2 },
+  { title: "Projects", url: "/projects", icon: FolderCode },
+  { title: "Experience", url: "/experiences", icon: HardHat },
+  { title: "Messages", url: "/messages", icon: MessageSquareMore },
 ];
 
 export function Navigation() {
@@ -68,7 +78,7 @@ export function Navigation() {
                     className="gap-4 text-base hover:bg-neutral-800 hover:text-white"
                     render={<Link to={item.url} />}
                   >
-                    <item.icon className="size-10 text-lime-500" />
+                    <item.icon className="size-10 text-sky-500" />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

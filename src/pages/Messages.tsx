@@ -5,6 +5,7 @@ import {
   type DeleteMessageRequest,
   type GetMessagesResponse,
   type SimpleResponse,
+  type FetchError,
 } from "@/lib/objects";
 
 import { List } from "@/components/pages/messages/List";
@@ -13,12 +14,10 @@ import { Loading } from "@/components/Loading";
 import { Error } from "@/components/Error";
 
 export default function Messages() {
-  const { data, isLoading, isError } = useDataQuery<null, GetMessagesResponse>(
-    "manager",
-    ["messages"],
-    "/message/list",
-    false,
-  );
+  const { data, isLoading, isError, error } = useDataQuery<
+    null,
+    GetMessagesResponse
+  >("manager", ["messages"], "/message/list", false);
 
   const {
     mutateAsync,
@@ -40,9 +39,18 @@ export default function Messages() {
     return <Loading content="messages" />;
   }
 
-  if (isError || deleteError || !data) {
+  const isNotFoundError =
+    isError &&
+    error &&
+    "status" in error &&
+    (error as FetchError).status === 404;
+  const hasError = (isError && !isNotFoundError) || deleteError;
+
+  if (hasError || (!data && !isNotFoundError)) {
     return <Error content="messages" />;
   }
+
+  const messagesList = isNotFoundError ? [] : data?.messages || [];
 
   return (
     <div className="mx-auto flex max-h-screen w-full flex-col gap-6 text-white">
@@ -54,7 +62,7 @@ export default function Messages() {
       </div>
 
       <List
-        data={data.messages}
+        data={messagesList}
         isDeleting={isPending}
         mutateAsync={mutateAsync}
       />

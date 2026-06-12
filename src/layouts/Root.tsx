@@ -1,10 +1,13 @@
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useSearchParams } from "react-router";
 
 import { Toaster } from "sonner";
 
+import { useDataQuery } from "@/api/handler";
 import { useAuth } from "@/contexts/AuthContext";
+import { type UserDetailsResponse } from "@/lib/objects";
 
+import { Loading } from "@/components/Loading";
 import { Navigation } from "@/components/Navigation";
 
 import {
@@ -16,14 +19,55 @@ import {
 const CONSOLE_URL = import.meta.env.VITE_CONSOLE_URL;
 
 export function RootLayout() {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, login } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const authParam = searchParams.get("auth");
+
+  const { isError } = useDataQuery<null, UserDetailsResponse>(
+    "manager",
+    ["session", "validate"],
+    "/user/details",
+    false,
+    {
+      enabled: authParam === "success",
+      skipAuthErrorHandling: true,
+      onSuccess: () => {
+        login();
+        setSearchParams(
+          (prev) => {
+            prev.delete("auth");
+            return prev;
+          },
+          { replace: true },
+        );
+      },
+    },
+  );
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate(`${CONSOLE_URL}/login?ref=Manager`, { replace: true });
+    if (authParam === "success") {
+      if (isError) {
+        console.error("Session validation failed.");
+        setSearchParams(
+          (prev) => {
+            prev.delete("auth");
+            return prev;
+          },
+          { replace: true },
+        );
+      }
+    } else if (!isAuthenticated) {
+      window.location.href = `${CONSOLE_URL}/login?redirect=Manager`;
     }
-  }, [isAuthenticated, navigate]);
+  }, [authParam, isError, isAuthenticated, setSearchParams]);
+
+  if (authParam === "success" || !isAuthenticated) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center bg-neutral-950 text-center">
+        <Loading content="session" />
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider className="bg-neutral-950" defaultOpen={false}>

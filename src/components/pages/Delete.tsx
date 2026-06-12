@@ -37,12 +37,12 @@ export function Delete<T extends string | number>({
         <Button
           variant="ghost"
           size="icon-sm"
-          className="text-red-500 hover:bg-red-500/10 hover:text-red-600 hover:ring hover:ring-red-500"
+          className="rounded-md text-red-500 hover:bg-red-500/10 hover:text-red-600 hover:ring hover:ring-red-500"
         >
           <Trash2 className="size-4" />
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="border-red-500">
+      <AlertDialogContent className="min-w-fit rounded-lg border border-red-500 bg-neutral-950">
         <AlertDialogHeader>
           <AlertDialogTitle>
             How <span className="font-medium text-emerald-500/50">high</span>{" "}
@@ -54,9 +54,9 @@ export function Delete<T extends string | number>({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="rounded-md">Cancel</AlertDialogCancel>
           <AlertDialogAction
-            className="bg-neutral-950! text-red-500 hover:bg-red-500/10! hover:text-red-600 hover:ring hover:ring-red-500"
+            className="rounded-md bg-neutral-950 text-red-500 hover:bg-red-500/10 hover:text-red-600 hover:ring hover:ring-red-500"
             onClick={() => mutateAsync({ id })}
             disabled={isDeleting}
           >

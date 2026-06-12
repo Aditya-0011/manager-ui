@@ -1,4 +1,3 @@
-import { DateTime } from "luxon";
 import { z } from "zod";
 
 export const SimpleResponseSchema = z.object({
@@ -28,16 +27,10 @@ export type ServiceApiMapping = z.infer<typeof ServiceApiMappingSchema>;
 export const UserDetailsResponseSchema = z.object({
   about: z.string().trim(),
   cover_image: z.url(),
-  updated_at: z
-    .object({
-      seconds: z.number(),
-      nanos: z.number(),
-    })
-    .transform((value) =>
-      DateTime.fromSeconds(value.seconds, {
-        zone: "Asia/Kolkata",
-      }).toLocaleString(DateTime.DATETIME_MED),
-    ),
+  updated_at: z.object({
+    seconds: z.number(),
+    nanos: z.number(),
+  }),
 });
 export type UserDetailsResponse = z.infer<typeof UserDetailsResponseSchema>;
 
@@ -126,16 +119,10 @@ export const TechnologySchema = z.object({
   image_url: z.url(),
   fallback_image_url: z.url(),
   category: TechnologyCategorySchema,
-  updated_at: z
-    .object({
-      seconds: z.number(),
-      nanos: z.number(),
-    })
-    .transform((value) =>
-      DateTime.fromSeconds(value.seconds, {
-        zone: "Asia/Kolkata",
-      }).toLocaleString(DateTime.DATETIME_MED),
-    ),
+  updated_at: z.object({
+    seconds: z.number(),
+    nanos: z.number(),
+  }),
 });
 export type Technology = z.infer<typeof TechnologySchema>;
 
@@ -209,16 +196,10 @@ export const ProjectSchema = z.object({
   github_url: z.url().optional(),
   technologies: z.array(TechnologySummarySchema).optional(),
   featured: z.boolean(),
-  updated_at: z
-    .object({
-      seconds: z.number(),
-      nanos: z.number(),
-    })
-    .transform((value) =>
-      DateTime.fromSeconds(value.seconds, {
-        zone: "Asia/Kolkata",
-      }).toLocaleString(DateTime.DATETIME_MED),
-    ),
+  updated_at: z.object({
+    seconds: z.number(),
+    nanos: z.number(),
+  }),
 });
 export type Project = z.infer<typeof ProjectSchema>;
 
@@ -357,16 +338,10 @@ export const ExperienceSchema = z.object({
   tenure: z.string(),
   positions: z.array(PositionSchema),
   technologies: z.array(TechnologySummarySchema),
-  updated_at: z
-    .object({
-      seconds: z.number(),
-      nanos: z.number(),
-    })
-    .transform((value) =>
-      DateTime.fromSeconds(value.seconds, {
-        zone: "Asia/Kolkata",
-      }).toLocaleString(DateTime.DATETIME_MED),
-    ),
+  updated_at: z.object({
+    seconds: z.number(),
+    nanos: z.number(),
+  }),
 });
 export type Experience = z.infer<typeof ExperienceSchema>;
 

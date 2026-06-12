@@ -61,7 +61,7 @@ export function Form({ data }: { data: UserDetailsResponse }) {
           <Button
             form="about-form"
             type="submit"
-            className="bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500"
+            className="rounded-md bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500"
             disabled={isPending}
           >
             {isPending ? "Saving..." : "Save"}
@@ -99,7 +99,7 @@ export function Form({ data }: { data: UserDetailsResponse }) {
                         }
                         aria-invalid={isInvalid}
                         placeholder="Type markdown here..."
-                        className="h-full min-h-90 font-mono focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                        className="border-input h-full min-h-90 rounded-md border bg-transparent font-mono text-inherit focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />
@@ -129,7 +129,7 @@ export function Form({ data }: { data: UserDetailsResponse }) {
                   <Field>
                     <FieldLabel>Preview</FieldLabel>
                     <div className="prose prose-invert prose-p:mt-0 prose-p:mb-5 prose-p:leading-normal prose-headings:font-mono prose-ul:my-5 prose-ol:my-5 prose-li:my-0 border-input h-full min-h-90 w-full max-w-none overflow-y-auto rounded-md border bg-transparent px-3 py-2 font-mono text-sm leading-normal shadow-sm">
-                      <div className="rounded-md bg-transparent! text-inherit!">
+                      <div className="rounded-md bg-transparent text-inherit">
                         <ReactMarkdown
                           components={{
                             ul: ({ children, className }) => (
@@ -165,7 +165,7 @@ export function Form({ data }: { data: UserDetailsResponse }) {
                               rel,
                             }) => (
                               <a
-                                className={`underline decoration-sky-500 underline-offset-2 hover:text-sky-500 hover:no-underline hover:decoration-white ${className ?? ""}`}
+                                className={`underline decoration-emerald-500 underline-offset-2 hover:text-emerald-500 hover:no-underline hover:decoration-white ${className ?? ""}`}
                                 href={href}
                                 title={title}
                                 target={target}
@@ -210,7 +210,7 @@ export function Form({ data }: { data: UserDetailsResponse }) {
                         }
                         aria-invalid={isInvalid}
                         placeholder="Type image URL here..."
-                        className="font-mono focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                        className="border-input rounded-md border bg-transparent! font-mono text-inherit! focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                       />
                       {isInvalid && (
                         <FieldError errors={field.state.meta.errors} />

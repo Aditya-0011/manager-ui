@@ -3,12 +3,13 @@ import { Link } from "react-router";
 import { Home, ArrowLeft } from "lucide-react";
 
 import { useDataQuery } from "@/api/handler";
+import { type FetchError } from "@/lib/objects";
 
 import { Loading } from "@/components/Loading";
 import { Error } from "@/components/Error";
 
 export default function NotFound() {
-  const { data, isLoading, isError } = useDataQuery<null, string>(
+  const { data, isLoading, isError, error } = useDataQuery<null, string>(
     "auth",
     ["random"],
     "/random",
@@ -24,7 +25,14 @@ export default function NotFound() {
     );
   }
 
-  if (isError || !data) {
+  const is404Error =
+    isError &&
+    error &&
+    "status" in error &&
+    (error as FetchError).status === 404;
+  const content = is404Error ? (error as FetchError).message : data;
+
+  if (!content) {
     return (
       <div className="flex h-screen w-full items-center justify-center text-center">
         <Error content="custom slur" />
@@ -32,7 +40,7 @@ export default function NotFound() {
     );
   }
 
-  const [preffix, message] = data.split(":");
+  const [preffix, message] = content.split(":");
   return (
     <div className="flex min-h-screen items-center justify-center bg-neutral-950">
       <div className="mx-auto max-w-7xl px-1 text-center">

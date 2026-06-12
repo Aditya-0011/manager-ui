@@ -9,6 +9,7 @@ import {
   type GetProjectsResponse,
   type ProjectCreateRequest,
   type ProjectUpdateRequest,
+  type FetchError,
 } from "@/lib/objects";
 
 import { Form } from "@/components/pages/projects/Form";
@@ -22,10 +23,11 @@ export default function Projects() {
     data: technologies,
     isLoading: isLoadingTechnologies,
     isError: isTechnologiesFetchError,
+    error: technologiesError,
   } = useDataQuery<null, GetTechnologiesResponse>(
     "manager",
     ["technologies"],
-    "/technology/get",
+    "/technology/list",
     false,
   );
 
@@ -33,6 +35,7 @@ export default function Projects() {
     data: projects,
     isLoading: isLoadingProjects,
     isError: isProjectsFetchError,
+    error: projectsError,
   } = useDataQuery<null, GetProjectsResponse>(
     "manager",
     ["projects"],
@@ -51,7 +54,7 @@ export default function Projects() {
     {
       invalidateKey: [["projects"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -67,7 +70,7 @@ export default function Projects() {
     {
       invalidateKey: [["projects"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -83,7 +86,7 @@ export default function Projects() {
     {
       invalidateKey: [["projects"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -97,17 +100,37 @@ export default function Projects() {
   ) {
     return <Loading content="projects" />;
   }
+
+  const isTechNotFoundError =
+    isTechnologiesFetchError &&
+    technologiesError &&
+    "status" in technologiesError &&
+    (technologiesError as FetchError).status === 404;
+  const hasTechError = isTechnologiesFetchError && !isTechNotFoundError;
+
+  const isProjNotFoundError =
+    isProjectsFetchError &&
+    projectsError &&
+    "status" in projectsError &&
+    (projectsError as FetchError).status === 404;
+  const hasProjError = isProjectsFetchError && !isProjNotFoundError;
+
   if (
-    isTechnologiesFetchError ||
-    isProjectsFetchError ||
+    hasTechError ||
+    hasProjError ||
     isCreatingProjectError ||
     isUpdatingProjectError ||
     isDeletingProjectError ||
-    !technologies ||
-    !projects
+    (!technologies && !isTechNotFoundError) ||
+    (!projects && !isProjNotFoundError)
   ) {
     return <Error content="projects" />;
   }
+
+  const technologiesList = isTechNotFoundError
+    ? []
+    : technologies?.technologies || [];
+  const projectsList = isProjNotFoundError ? [] : projects?.projects || [];
 
   return (
     <div className="mx-auto flex max-h-screen w-full flex-col gap-6 text-white">
@@ -117,14 +140,14 @@ export default function Projects() {
           <p className="text-muted-foreground mt-1 text-xs">Sky's the limit!</p>
         </div>
         <Form
-          technologies={technologies.technologies}
+          technologies={technologiesList}
           isCreatingProject={isCreatingProject}
           mutateProjectAsync={createProjectAsync}
         />
       </div>
       <List
-        projects={projects.projects}
-        technologies={technologies.technologies}
+        projects={projectsList}
+        technologies={technologiesList}
         isUpdatingProject={isUpdatingProject}
         isDeletingProject={isDeletingProject}
         updateProjectAsync={updateProjectAsync}

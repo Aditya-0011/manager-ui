@@ -8,6 +8,7 @@ import {
   type TechnologyUpdateRequest,
   type TechnologyCreateRequest,
   type GetTechnologiesResponse,
+  type FetchError,
 } from "@/lib/objects";
 
 import { List } from "@/components/pages/technologies/List";
@@ -17,7 +18,7 @@ import { Loading } from "@/components/Loading";
 import { Error } from "@/components/Error";
 
 export default function Technologies() {
-  const { data, isLoading, isError } = useDataQuery<
+  const { data, isLoading, isError, error } = useDataQuery<
     null,
     GetTechnologiesResponse
   >("manager", ["technologies"], "/technology/list", false);
@@ -33,7 +34,7 @@ export default function Technologies() {
     {
       invalidateKey: [["technologies"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -49,7 +50,7 @@ export default function Technologies() {
     {
       invalidateKey: [["technologies"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -65,7 +66,7 @@ export default function Technologies() {
     {
       invalidateKey: [["technologies"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -74,9 +75,19 @@ export default function Technologies() {
     return <Loading content="technologies" />;
   }
 
-  if (isError || createError || updateError || deleteError || !data) {
+  const isNotFoundError =
+    isError &&
+    error &&
+    "status" in error &&
+    (error as FetchError).status === 404;
+  const hasError =
+    (isError && !isNotFoundError) || createError || updateError || deleteError;
+
+  if (hasError || (!data && !isNotFoundError)) {
     return <Error content="technologies" />;
   }
+
+  const technologiesList = isNotFoundError ? [] : data?.technologies || [];
 
   return (
     <div className="mx-auto flex max-h-screen w-full flex-col gap-6 text-white">
@@ -90,7 +101,7 @@ export default function Technologies() {
         <Form isCreating={isCreating} mutateAsync={createAsync} />
       </div>
       <List
-        technologies={data.technologies}
+        technologies={technologiesList}
         isUpdating={isUpdating}
         isDeleting={isDeleting}
         updateAsync={updateAsync}

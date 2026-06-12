@@ -10,6 +10,7 @@ import {
   type GetExperiencesResponse,
   type ExperienceCreateRequest,
   type ExperienceUpdateRequest,
+  type FetchError,
 } from "@/lib/objects";
 
 import { Form } from "@/components/pages/experiences/Form";
@@ -23,10 +24,11 @@ export default function Experiences() {
     data: technologies,
     isLoading: isLoadingTechnologies,
     isError: isTechnologiesFetchError,
+    error: technologiesError,
   } = useDataQuery<null, GetTechnologiesResponse>(
     "manager",
     ["technologies"],
-    "/technology/get",
+    "/technology/list",
     false,
   );
 
@@ -34,10 +36,11 @@ export default function Experiences() {
     data: projects,
     isLoading: isLoadingProjects,
     isError: isProjectsFetchError,
+    error: projectsError,
   } = useDataQuery<null, GetProjectsResponse>(
     "manager",
     ["projects"],
-    "/project/get",
+    "/project/list",
     false,
   );
 
@@ -45,10 +48,11 @@ export default function Experiences() {
     data: experiences,
     isLoading: isLoadingExperiences,
     isError: isExperiencesFetchError,
+    error: experiencesError,
   } = useDataQuery<null, GetExperiencesResponse>(
     "manager",
     ["experiences"],
-    "/experience/get",
+    "/experience/list",
     false,
   );
 
@@ -58,12 +62,12 @@ export default function Experiences() {
     isError: isCreatingExperienceError,
   } = useDataMutation<ExperienceCreateRequest, SimpleResponse>(
     "manager",
-    "/experience/create",
+    "/experience/add",
     false,
     {
       invalidateKey: [["experiences"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -74,12 +78,12 @@ export default function Experiences() {
     isError: isUpdatingExperienceError,
   } = useDataMutation<ExperienceUpdateRequest, SimpleResponse>(
     "manager",
-    "/experience/update",
+    "/experience/edit",
     false,
     {
       invalidateKey: [["experiences"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -95,7 +99,7 @@ export default function Experiences() {
     {
       invalidateKey: [["experiences"]],
       onSuccess: (data) => {
-        toast.success(data.message, { toasterId: "root" });
+        toast.success(data.message);
       },
     },
   );
@@ -110,19 +114,49 @@ export default function Experiences() {
   ) {
     return <Loading content="experiences" />;
   }
+
+  const isTechNotFoundError =
+    isTechnologiesFetchError &&
+    technologiesError &&
+    "status" in technologiesError &&
+    (technologiesError as FetchError).status === 404;
+  const hasTechError = isTechnologiesFetchError && !isTechNotFoundError;
+
+  const isProjNotFoundError =
+    isProjectsFetchError &&
+    projectsError &&
+    "status" in projectsError &&
+    (projectsError as FetchError).status === 404;
+  const hasProjError = isProjectsFetchError && !isProjNotFoundError;
+
+  const isExpNotFoundError =
+    isExperiencesFetchError &&
+    experiencesError &&
+    "status" in experiencesError &&
+    (experiencesError as FetchError).status === 404;
+  const hasExpError = isExperiencesFetchError && !isExpNotFoundError;
+
   if (
-    isTechnologiesFetchError ||
-    isProjectsFetchError ||
-    isExperiencesFetchError ||
+    hasTechError ||
+    hasProjError ||
+    hasExpError ||
     isCreatingExperienceError ||
     isUpdatingExperienceError ||
     isDeletingExperienceError ||
-    !technologies ||
-    !projects ||
-    !experiences
+    (!technologies && !isTechNotFoundError) ||
+    (!projects && !isProjNotFoundError) ||
+    (!experiences && !isExpNotFoundError)
   ) {
     return <Error content="experiences" />;
   }
+
+  const technologiesList = isTechNotFoundError
+    ? []
+    : technologies?.technologies || [];
+  const projectsList = isProjNotFoundError ? [] : projects?.projects || [];
+  const experiencesList = isExpNotFoundError
+    ? []
+    : experiences?.experiences || [];
 
   return (
     <div className="mx-auto flex max-h-screen w-full flex-col gap-6 text-white">
@@ -135,17 +169,17 @@ export default function Experiences() {
         </div>
         <div>
           <Form
-            technologies={technologies.technologies}
-            projects={projects.projects}
+            technologies={technologiesList}
+            projects={projectsList}
             isCreatingExperience={isCreatingExperience}
             mutateExperienceAsync={createExperienceAsync}
           />
         </div>
       </div>
       <List
-        technologies={technologies.technologies}
-        projects={projects.projects}
-        experiences={experiences.experiences}
+        technologies={technologiesList}
+        projects={projectsList}
+        experiences={experiencesList}
         isUpdatingExperience={isUpdatingExperience}
         isDeletingExperience={isDeletingExperience}
         updateExperienceAsync={updateExperienceAsync}

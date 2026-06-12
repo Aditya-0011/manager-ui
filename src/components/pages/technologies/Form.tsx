@@ -109,18 +109,18 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
             <Button
               variant="ghost"
               size="icon-sm"
-              className="text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
+              className="rounded-md text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
             >
               <Edit2 className="size-4" />
             </Button>
           ) : (
-            <Button className="bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500">
+            <Button className="rounded-md bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500">
               Add
             </Button>
           )}
         </DialogTrigger>
         <DialogContent
-          className="border-white sm:max-w-106.25"
+          className="border border-white bg-neutral-950 sm:max-w-106.25"
           showCloseButton={false}
         >
           <DialogHeader>
@@ -162,7 +162,7 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
                       disabled={isCreating || isUpdating}
                       type="text"
                       required
-                      className="focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                      className="border-input rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -191,7 +191,7 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
                       type="url"
                       disabled={isCreating || isUpdating}
                       required
-                      className="focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                      className="border-input rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -222,7 +222,7 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
                       disabled={isCreating || isUpdating}
                       type="url"
                       required
-                      className="focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                      className="border-input rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                     />
                     {isInvalid && (
                       <FieldError errors={field.state.meta.errors} />
@@ -250,17 +250,24 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
                       aria-invalid={isInvalid}
                       required
                     >
-                      <SelectTrigger id={field.name} className="w-full">
+                      <SelectTrigger
+                        id={field.name}
+                        className="border-input w-full rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
+                      >
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="border-input rounded-md border px-1 py-2">
                         {Object.entries(TechnologyCategory)
                           .filter(
                             ([name]) =>
                               isNaN(Number(name)) && name !== "Invalid",
                           )
                           .map(([name, value]) => (
-                            <SelectItem key={name} value={value.toString()}>
+                            <SelectItem
+                              key={name}
+                              value={value.toString()}
+                              className="rounded-md"
+                            >
                               {getTechnologyCategoryLabel(
                                 value as TechnologyCategory,
                               )}
@@ -283,6 +290,7 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
                   variant="outline"
                   size="default"
                   onClick={() => reset()}
+                  className="rounded-md"
                 >
                   Cancel
                 </Button>
@@ -291,7 +299,7 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
                 form={formId}
                 type="submit"
                 disabled={isCreating || isUpdating}
-                className="bg-neutral-950 text-sky-500 hover:bg-sky-500/10 hover:text-sky-600 hover:inset-ring hover:ring-sky-500"
+                className="rounded-md bg-neutral-950 text-sky-500 hover:bg-sky-500/10 hover:text-sky-600 hover:inset-ring hover:ring-sky-500"
               >
                 Save
               </Button>
