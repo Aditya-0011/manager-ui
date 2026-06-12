@@ -1,6 +1,6 @@
 # Manager UI
 
-The frontend application for user portfolios and profile management.
+The portfolio content editor dashboard for the developer platform.
 
 [![React Version](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-Build-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
@@ -8,7 +8,7 @@ The frontend application for user portfolios and profile management.
 
 ## Overview
 
-The Manager UI is a dedicated frontend application acting as the primary interface for users to manage their portfolios, experiences, projects, and platform profiles. It interacts directly with the `manager` service via the API `gateway` to provide a highly interactive and responsive user experience.
+The Manager UI acts as the visual Headless CMS interface for the platform. It interacts securely with the `manager` gRPC backend (via the API `gateway`) to allow users to visually edit their portfolios, add new showcase projects, tag technologies, map out work experiences, and review contact messages submitted from their public websites.
 
 ## Architecture & Tech Stack
 
@@ -35,6 +35,15 @@ The Manager UI is a dedicated frontend application acting as the primary interfa
 - 🎨 **Modern Design**: Built using `@base-ui/react` and Tailwind CSS, with dynamic theming support (`next-themes`).
 - 🔄 **Reactive Data**: Integrated with TanStack Query to provide optimistic updates, caching, and background data synchronization.
 - 📝 **Type-Safe Validation**: Forms and API responses are strictly validated on the client side using `zod`.
+
+## Platform Routing
+
+The manager dashboard is structured around the core entities of a user's portfolio:
+- `/about`: Updating the core user profile and cover images.
+- `/technologies`: Managing the taxonomy of the user's tech stack.
+- `/projects`: Adding and editing showcase projects.
+- `/experiences`: Visually mapping the timeline of companies and nested job positions.
+- `/messages`: Reviewing contact form submissions.
 
 ## Getting Started
 
