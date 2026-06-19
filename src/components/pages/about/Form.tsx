@@ -57,7 +57,6 @@ export function Form({ data }: { data: UserDetailsResponse }) {
           <h1 className="text-3xl font-semibold">About</h1>
           {data?.updated_at && <UpdatedOn value={data.updated_at} />}
         </div>
-        {data?.updated_at && (
           <Button
             form="about-form"
             type="submit"
@@ -66,7 +65,6 @@ export function Form({ data }: { data: UserDetailsResponse }) {
           >
             {isPending ? "Saving..." : "Save"}
           </Button>
-        )}
       </div>
 
       <form
