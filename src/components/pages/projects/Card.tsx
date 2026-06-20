@@ -22,6 +22,7 @@ import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
+  TooltipProvider,
 } from "@/components/ui/tooltip";
 
 import { Form } from "@/components/pages/projects/Form";
@@ -137,33 +138,41 @@ const ProjectCard = memo(
           {project.technologies && project.technologies.length > 0 && (
             <>
               <Separator />
-              <ul
-                role="list"
-                className="mt-2 flex flex-wrap items-center justify-evenly gap-4"
-              >
-                {project.technologies.map((tech) => (
-                  <li key={`${project.id}-${tech.id}`} className="size-6">
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <img
-                          src={tech.image_url}
-                          onError={(event) => {
-                            const fallback = tech.fallback_image_url;
-                            if (event.currentTarget.src !== fallback) {
-                              event.currentTarget.src = fallback;
-                            }
-                          }}
-                          alt={tech.name}
-                          className="size-full object-contain"
-                        />
-                      </TooltipTrigger>
-                      <TooltipContent className="bg-cyan-500/10 text-cyan-600 ring ring-cyan-500 backdrop-blur-sm [&_svg]:my-0.5 [&_svg]:size-1.5 [&_svg]:bg-cyan-500 [&_svg]:fill-cyan-500">
-                        {tech.name}
-                      </TooltipContent>
-                    </Tooltip>
-                  </li>
-                ))}
-              </ul>
+              <TooltipProvider>
+                <ul
+                  role="list"
+                  className="flex flex-wrap items-center justify-evenly gap-4"
+                >
+                  {project.technologies
+                    .sort((a, b) =>
+                      a.name.localeCompare(b.name, "en", {
+                        sensitivity: "accent",
+                      }),
+                    )
+                    .map((tech) => (
+                      <li key={`${project.id}-${tech.id}`} className="size-6">
+                        <Tooltip>
+                          <TooltipTrigger className="flex size-full items-center justify-center p-0">
+                            <img
+                              src={tech.image_url}
+                              onError={(event) => {
+                                const fallback = tech.fallback_image_url;
+                                if (event.currentTarget.src !== fallback) {
+                                  event.currentTarget.src = fallback;
+                                }
+                              }}
+                              alt={tech.name}
+                              className="size-full object-contain"
+                            />
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-cyan-500/10 text-cyan-600 ring ring-cyan-500 backdrop-blur-sm">
+                            {tech.name}
+                          </TooltipContent>
+                        </Tooltip>
+                      </li>
+                    ))}
+                </ul>
+              </TooltipProvider>
             </>
           )}
         </CardContent>

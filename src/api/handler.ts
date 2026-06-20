@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import {
   useMutation,
   useQuery,
@@ -73,10 +72,9 @@ export function useDataQuery<Request, Response>(
     enabled?: boolean;
   },
 ) {
-  const queryClient = useQueryClient();
   const { logout } = useAuth();
 
-  const queryResult = useQuery<Response, Error>({
+  return useQuery<Response, Error>({
     queryKey: [...key, url, app, textOnlyResponse],
     queryFn: () =>
       fetcher<Request, Response>(app, url, undefined, "GET", textOnlyResponse),
@@ -95,42 +93,13 @@ export function useDataQuery<Request, Response>(
       }
       return failureCount < 3;
     },
+    meta: {
+      onSuccess: options?.onSuccess,
+      invalidateKey: options?.invalidateKey,
+      skipAuthErrorHandling: options?.skipAuthErrorHandling,
+      logout,
+    },
   });
-
-  useEffect(() => {
-    if (queryResult.isSuccess) {
-      if (options?.onSuccess) options.onSuccess(queryResult.data as Response);
-      if (options?.invalidateKey) {
-        for (const key of options.invalidateKey) {
-          queryClient.invalidateQueries({ queryKey: key });
-        }
-      }
-    }
-  }, [queryResult.isSuccess, queryResult.data, options, queryClient]);
-
-  useEffect(() => {
-    if (queryResult.isError && queryResult.error instanceof FetchError) {
-      const { message, status } = queryResult.error as FetchError;
-      if (status === 401 || status === 0) {
-        if (!options?.skipAuthErrorHandling) {
-          queryClient.clear();
-          logout();
-          toast.error(message);
-          window.location.href = `${CONSOLE_URL}/login?redirect=Manager`;
-          return;
-        }
-      }
-      toast.error(message);
-    }
-  }, [
-    queryResult.isError,
-    queryResult.error,
-    queryClient,
-    logout,
-    options?.skipAuthErrorHandling,
-  ]);
-
-  return queryResult;
 }
 
 export function useDataMutation<Request, Response>(

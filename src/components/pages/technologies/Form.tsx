@@ -254,7 +254,15 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
                         id={field.name}
                         className="border-input w-full rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500"
                       >
-                        <SelectValue />
+                        <SelectValue>
+                          {(val: string | null) =>
+                            val
+                              ? getTechnologyCategoryLabel(
+                                  Number(val) as TechnologyCategory,
+                                )
+                              : "Select Category"
+                          }
+                        </SelectValue>
                       </SelectTrigger>
                       <SelectContent className="border-input rounded-md border px-1 py-2">
                         {Object.entries(TechnologyCategory)
