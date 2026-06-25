@@ -166,20 +166,20 @@ export function Form({
         }}
         key={experience?.id || "create"}
       >
-        <DialogTrigger>
-          {experience ? (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="rounded-md text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
-            >
-              <Edit2 className="size-4" />
-            </Button>
-          ) : (
-            <Button className="rounded-md bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500">
-              Add
-            </Button>
-          )}
+        <DialogTrigger
+          render={
+            experience ? (
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                className="rounded-md text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
+              />
+            ) : (
+              <Button className="rounded-md bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500" />
+            )
+          }
+        >
+          {experience ? <Edit2 className="size-4" /> : "Add"}
         </DialogTrigger>
         <DialogContent
           className="border border-white bg-neutral-950 sm:max-w-200"

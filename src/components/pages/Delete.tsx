@@ -33,14 +33,16 @@ export function Delete<T extends string | number>({
 }: DeleteProps<T>) {
   return (
     <AlertDialog>
-      <AlertDialogTrigger>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="rounded-md text-red-500 hover:bg-red-500/10 hover:text-red-600 hover:ring hover:ring-red-500"
-        >
-          <Trash2 className="size-4" />
-        </Button>
+      <AlertDialogTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="rounded-md text-red-500 hover:bg-red-500/10 hover:text-red-600 hover:ring hover:ring-red-500"
+          />
+        }
+      >
+        <Trash2 className="size-4" />
       </AlertDialogTrigger>
       <AlertDialogContent className="min-w-fit rounded-lg border border-red-500 bg-neutral-950">
         <AlertDialogHeader>

@@ -89,14 +89,8 @@ export function Navigation() {
                       )
                     }
                   >
-                    <item.icon
-                      className={`size-10 ${pathname === item.url ? "text-lime-500" : "text-sky-500"}`}
-                    />
-                    <span
-                      className={pathname === item.url ? "text-lime-500" : ""}
-                    >
-                      {item.title}
-                    </span>
+                    <item.icon className="size-10 text-sky-500" />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
