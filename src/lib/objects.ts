@@ -46,7 +46,7 @@ const MessageSchema = z.object({
   id: z.string(),
   name: z.string().trim(),
   email: z.email(),
-  messages: z.array(z.string().trim()),
+  message: z.array(z.string().trim()),
 });
 export type Message = z.infer<typeof MessageSchema>;
 

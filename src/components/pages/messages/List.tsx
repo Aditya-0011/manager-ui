@@ -29,7 +29,7 @@ export function List({
 
   return (
     <div className="columns-1 gap-4 pb-4 sm:columns-2 lg:columns-4">
-      {data.map(({ id, name, email, messages }) => (
+      {data.map(({ id, name, email, message }) => (
         <Card
           key={id}
           className="bg-muted/5 hover:bg-muted/50 mb-4 break-inside-avoid py-3 ring ring-white/10 backdrop-blur transition-all hover:scale-[1.01] hover:ring-white"
@@ -53,12 +53,12 @@ export function List({
               Messages
             </p>
             <ul className="list-inside list-disc space-y-2 text-sm leading-relaxed text-white/90">
-              {messages.map((message, index) => (
+              {message.map((msg, index) => (
                 <li
                   key={`${id}-${index}`}
                   className="marker:text-muted-foreground"
                 >
-                  {message}
+                  {msg}
                 </li>
               ))}
             </ul>
