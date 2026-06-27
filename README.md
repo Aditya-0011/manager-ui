@@ -1,6 +1,6 @@
 # Manager UI
 
-The portfolio content editor dashboard for the developer platform.
+The portfolio content editor dashboard for the platform.
 
 [![React Version](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-Build-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
@@ -8,72 +8,76 @@ The portfolio content editor dashboard for the developer platform.
 
 ## Overview
 
-The Manager UI acts as the visual Headless CMS interface for the platform. It interacts securely with the `manager` gRPC backend (via the API `gateway`) to allow users to visually edit their portfolios, add new showcase projects, tag technologies, map out work experiences, and review contact messages submitted from their public websites.
+The manager UI acts as the visual headless CMS interface for the platform. It interacts securely with the `manager` gRPC backend via the API gateway to let you visually edit portfolios, add showcase projects, tag technologies, map out work experiences, and review contact messages.
 
-## Architecture & Tech Stack
+## Architecture
 
-- **Framework**: Built with React 19 and compiled using Vite for instantaneous hot-module replacement (HMR) and optimized production bundles.
-- **Package Manager**: Managed and executed using `bun` for maximum speed.
-- **Styling**: Fully styled with Tailwind CSS v4, utilizing `shadcn` tooling alongside `@base-ui/react` primitives.
-- **State & Data Fetching**: Relies on `@tanstack/react-query` for asynchronous state management and `@tanstack/react-form` for complex form handling.
-- **Routing**: Client-side navigation handled by React Router v7.
+This section explains the technologies and physical layout of the manager UI.
 
-### Project Structure
+- **Framework**: Built with React 19 and compiled using Vite for hot-module replacement
+- **Package manager**: Managed and executed using `bun`
+- **Styling**: Styled with Tailwind CSS v4, utilizing `shadcn` tooling and `@base-ui/react` primitives
+- **State**: Uses `@tanstack/react-query` for asynchronous state management and `@tanstack/react-form` for complex form handling
+- **Routing**: Client-side navigation handled by React Router v8
 
-```text
-.
-├── public/        # Static assets
-├── src/           # React component source code
-├── index.html     # Application entrypoint template
-├── package.json   # Dependencies and scripts
-└── vite.config.ts # Vite configuration
-```
+### Project structure
+
+- `public/`: Static assets
+- `src/`: React component source code
+- `index.html`: Application entrypoint template
+- `package.json`: Dependencies and scripts
+- `vite.config.ts`: Vite configuration
 
 ## Features
 
-- ⚡ **Lightning Fast**: Bootstrapped with Vite and React 19 Compiler plugins for top-tier rendering performance.
-- 🎨 **Modern Design**: Built using `@base-ui/react` and Tailwind CSS, with dynamic theming support (`next-themes`).
-- 🔄 **Reactive Data**: Integrated with TanStack Query to provide optimistic updates, caching, and background data synchronization.
-- 📝 **Type-Safe Validation**: Forms and API responses are strictly validated on the client side using `zod`.
+This section outlines the capabilities of the manager UI.
 
-## Platform Routing
+- **Performance**: Bootstrapped with Vite and React 19 Compiler plugins for rendering performance.
+- **Design**: Built using `@base-ui/react` and Tailwind CSS, with dynamic theming support.
+- **Reactive data**: Uses TanStack Query to provide optimistic updates, caching, and background data synchronization.
+- **Type-safe validation**: Forms and API responses validate strictly on the client side using `zod`.
 
-The manager dashboard is structured around the core entities of a user's portfolio:
-- `/about`: Updating the core user profile and cover images.
-- `/technologies`: Managing the taxonomy of the user's tech stack.
-- `/projects`: Adding and editing showcase projects.
-- `/experiences`: Visually mapping the timeline of companies and nested job positions.
-- `/messages`: Reviewing contact form submissions.
+## Platform routing
 
-## Getting Started
+The manager dashboard is structured around the core entities of a portfolio:
+
+- `/about`: Update the core profile and cover images
+- `/technologies`: Manage the taxonomy of the tech stack
+- `/projects`: Add and edit showcase projects
+- `/experiences`: Visually map the timeline of companies and nested job positions
+- `/messages`: Review contact form submissions
+
+## Getting started
+
+This section explains how to run the manager UI locally.
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) is required to manage dependencies and run scripts efficiently.
+- [Bun](https://bun.sh/) to manage dependencies and run scripts
 
 ### Configuration
 
-The frontend relies on the following environment variables to correctly route requests to the backend gateway and cross-link to other UI portals. You should export these in your shell environment.
+Export these variables directly in your shell environment:
 
 | Variable | Description | Required |
 | :--- | :--- | :---: |
-| `VITE_AUTH_API_URL` | Endpoint for the public Auth API routes | **Yes** |
-| `VITE_MANAGER_API_URL` | Endpoint for the public Manager API routes | **Yes** |
-| `VITE_CONSOLE_URL` | Base URL of the deployed Console UI (used for cross-portal navigation) | **Yes** |
+| `VITE_AUTH_API_URL` | Endpoint for the public auth API routes | **Yes** |
+| `VITE_MANAGER_API_URL` | Endpoint for the public manager API routes | **Yes** |
+| `VITE_CONSOLE_URL` | Base URL of the deployed console UI | **Yes** |
 | `Development` | Boolean flag setting the environment to development mode | No |
 
-### Running the Service
+### Running locally
 
-Install dependencies and start the Vite development server:
+Install dependencies and start the development server:
 
 ```bash
 bun install
 bun run dev
 ```
 
-### Building for Production
+### Build for production
 
-To compile the application into static HTML/CSS/JS assets for deployment:
+Compile the application into static HTML, CSS, and JS assets for deployment:
 
 ```bash
 bun run build
