@@ -1,12 +1,11 @@
 import {
   type Experience,
-  type SimpleResponse,
   type ExperienceUpdateRequest,
   type DeleteRequest,
   type Technology,
   type Project,
 } from "@/lib/objects";
-import { formatMonthYear } from "@/lib/utils";
+import { formatMonthYear } from "@/lib/format";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,10 +21,8 @@ type ListProps = {
   experiences: Experience[];
   isUpdatingExperience: boolean;
   isDeletingExperience: boolean;
-  updateExperienceAsync: (
-    request: ExperienceUpdateRequest,
-  ) => Promise<SimpleResponse>;
-  deleteExperienceAsync: (request: DeleteRequest) => Promise<SimpleResponse>;
+  updateExperienceAsync: (request: ExperienceUpdateRequest) => Promise<boolean>;
+  onDeleteExperience: (request: DeleteRequest) => void;
 };
 
 export function List({
@@ -35,7 +32,7 @@ export function List({
   isUpdatingExperience,
   isDeletingExperience,
   updateExperienceAsync,
-  deleteExperienceAsync,
+  onDeleteExperience,
 }: ListProps) {
   if (experiences.length === 0) {
     return (
@@ -93,14 +90,14 @@ export function List({
                   projects={projects}
                   experience={exp}
                   isUpdatingExperience={isUpdatingExperience}
-                  mutateExperienceAsync={updateExperienceAsync}
+                  submitExperience={updateExperienceAsync}
                 />
                 <Delete
                   id={exp.id}
                   description="This action cannot be undone. This will delete the experience"
                   name={exp.company}
                   isDeleting={isDeletingExperience}
-                  mutateAsync={deleteExperienceAsync}
+                  onDelete={onDeleteExperience}
                 />
               </div>
             </CardFooter>

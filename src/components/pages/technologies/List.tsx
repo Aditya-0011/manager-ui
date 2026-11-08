@@ -1,7 +1,6 @@
 import {
   getTechnologyCategoryLabel,
   type Technology,
-  type SimpleResponse,
   type TechnologyUpdateRequest,
   type DeleteRequest,
 } from "@/lib/objects";
@@ -18,8 +17,8 @@ type ListProps = {
   technologies: Technology[];
   isUpdating: boolean;
   isDeleting: boolean;
-  updateAsync: (request: TechnologyUpdateRequest) => Promise<SimpleResponse>;
-  deleteAsync: (request: DeleteRequest) => Promise<SimpleResponse>;
+  updateAsync: (request: TechnologyUpdateRequest) => Promise<boolean>;
+  onDelete: (request: DeleteRequest) => void;
 };
 
 export function List({
@@ -27,7 +26,7 @@ export function List({
   isUpdating,
   isDeleting,
   updateAsync,
-  deleteAsync,
+  onDelete,
 }: ListProps) {
   const categoryStyles = (x: number): string => {
     switch (x) {
@@ -106,7 +105,7 @@ export function List({
                 <Form
                   data={tech}
                   isUpdating={isUpdating}
-                  mutateAsync={updateAsync}
+                  submit={updateAsync}
                 />
 
                 <Delete
@@ -114,7 +113,7 @@ export function List({
                   description="This action cannot be undone. This will delete the technology"
                   name={tech.name}
                   isDeleting={isDeleting}
-                  mutateAsync={deleteAsync}
+                  onDelete={onDelete}
                 />
               </div>
             </CardFooter>

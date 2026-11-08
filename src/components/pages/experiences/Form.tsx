@@ -8,7 +8,6 @@ import { Edit2, Plus, X, Projector } from "lucide-react";
 import {
   ExperienceCreateRequestSchema,
   ExperienceUpdateRequestSchema,
-  type SimpleResponse,
   type Technology,
   type Project,
   type Experience,
@@ -43,8 +42,8 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxValue,
-  useComboboxAnchor,
 } from "@/components/ui/combobox";
+import { useComboboxAnchor } from "@/hooks/use-combobox-anchor";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -56,9 +55,7 @@ type FormProps =
       experience: Experience;
       isCreatingExperience?: undefined;
       isUpdatingExperience: boolean;
-      mutateExperienceAsync: (
-        request: ExperienceUpdateRequest,
-      ) => Promise<SimpleResponse>;
+      submitExperience: (request: ExperienceUpdateRequest) => Promise<boolean>;
     }
   | {
       technologies: Technology[];
@@ -66,9 +63,7 @@ type FormProps =
       experience?: undefined;
       isCreatingExperience: boolean;
       isUpdatingExperience?: undefined;
-      mutateExperienceAsync: (
-        request: ExperienceCreateRequest,
-      ) => Promise<SimpleResponse>;
+      submitExperience: (request: ExperienceCreateRequest) => Promise<boolean>;
     };
 
 export function Form({
@@ -77,8 +72,9 @@ export function Form({
   experience,
   isCreatingExperience,
   isUpdatingExperience,
-  mutateExperienceAsync,
+  submitExperience,
 }: FormProps) {
+  const [open, setOpen] = useState(false);
   const formId = experience
     ? `experience-form-${experience.id}`
     : "experience-form-create";
@@ -126,14 +122,15 @@ export function Form({
         })),
       };
 
-      if (experience) {
-        await mutateExperienceAsync({
-          ...payload,
-          id: experience.id,
-        } as ExperienceUpdateRequest);
-      } else {
-        await mutateExperienceAsync(payload as ExperienceCreateRequest);
-      }
+      const saved = experience
+        ? await submitExperience({
+            ...payload,
+            id: experience.id,
+          } as ExperienceUpdateRequest)
+        : await submitExperience(payload as ExperienceCreateRequest);
+      if (!saved) return;
+      reset();
+      setOpen(false);
     },
   });
 
@@ -157,7 +154,13 @@ export function Form({
   };
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) reset();
+      }}
+    >
       <form
         id={formId}
         onSubmit={(e) => {
@@ -170,6 +173,7 @@ export function Form({
           render={
             experience ? (
               <Button
+                aria-label={`Edit ${experience.company}`}
                 variant="ghost"
                 size="icon-sm"
                 className="rounded-md text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
@@ -179,7 +183,7 @@ export function Form({
             )
           }
         >
-          {experience ? <Edit2 className="size-4" /> : "Add"}
+          {experience ? <Edit2 aria-hidden="true" /> : "Add"}
         </DialogTrigger>
         <DialogContent
           className="border border-white bg-neutral-950 sm:max-w-200"

@@ -1,4 +1,4 @@
-import { type Message, type SimpleResponse } from "@/lib/objects";
+import { type Message } from "@/lib/objects";
 
 import {
   Card,
@@ -13,11 +13,11 @@ import { Delete } from "@/components/pages/Delete";
 export function List({
   data,
   isDeleting,
-  mutateAsync,
+  onDelete,
 }: {
   data: Message[];
   isDeleting: boolean;
-  mutateAsync: (request: { id: string }) => Promise<SimpleResponse>;
+  onDelete: (request: { id: string }) => void;
 }) {
   if (data.length === 0) {
     return (
@@ -44,7 +44,7 @@ export function List({
               description="This action cannot be undone. This will delete the message(s) from"
               name={name}
               isDeleting={isDeleting}
-              mutateAsync={mutateAsync}
+              onDelete={onDelete}
             />
           </CardHeader>
 

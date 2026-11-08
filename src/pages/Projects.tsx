@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 
-import { useDataQuery, useDataMutation } from "@/api/handler";
+import { isNotFoundError, useDataQuery, useDataMutation } from "@/api/handler";
 
 import {
   type DeleteRequest,
@@ -9,7 +9,6 @@ import {
   type GetProjectsResponse,
   type ProjectCreateRequest,
   type ProjectUpdateRequest,
-  type FetchError,
 } from "@/lib/objects";
 
 import { Form } from "@/components/pages/projects/Form";
@@ -22,8 +21,8 @@ export default function Projects() {
   const {
     data: technologies,
     isLoading: isLoadingTechnologies,
-    isError: isTechnologiesFetchError,
     error: technologiesError,
+    refetch: refetchTechnologies,
   } = useDataQuery<null, GetTechnologiesResponse>(
     "manager",
     ["technologies"],
@@ -34,8 +33,8 @@ export default function Projects() {
   const {
     data: projects,
     isLoading: isLoadingProjects,
-    isError: isProjectsFetchError,
     error: projectsError,
+    refetch: refetchProjects,
   } = useDataQuery<null, GetProjectsResponse>(
     "manager",
     ["projects"],
@@ -43,94 +42,70 @@ export default function Projects() {
     false,
   );
 
-  const {
-    mutateAsync: createProjectAsync,
-    isPending: isCreatingProject,
-    isError: isCreatingProjectError,
-  } = useDataMutation<ProjectCreateRequest, SimpleResponse>(
-    "manager",
-    "/project/add",
-    false,
-    {
-      invalidateKey: [["projects"]],
-      onSuccess: (data) => {
-        toast.success(data.message);
+  const { submit: createProjectAsync, isPending: isCreatingProject } =
+    useDataMutation<ProjectCreateRequest, SimpleResponse>(
+      "manager",
+      "/project/add",
+      false,
+      {
+        invalidateKey: [["projects"]],
+        onSuccess: (data) => {
+          toast.success(data.message);
+        },
       },
-    },
-  );
+    );
 
-  const {
-    mutateAsync: updateProjectAsync,
-    isPending: isUpdatingProject,
-    isError: isUpdatingProjectError,
-  } = useDataMutation<ProjectUpdateRequest, SimpleResponse>(
-    "manager",
-    "/project/edit",
-    false,
-    {
-      invalidateKey: [["projects"]],
-      onSuccess: (data) => {
-        toast.success(data.message);
+  const { submit: updateProjectAsync, isPending: isUpdatingProject } =
+    useDataMutation<ProjectUpdateRequest, SimpleResponse>(
+      "manager",
+      "/project/edit",
+      false,
+      {
+        invalidateKey: [["projects"]],
+        onSuccess: (data) => {
+          toast.success(data.message);
+        },
       },
-    },
-  );
+    );
 
-  const {
-    mutateAsync: deleteProjectAsync,
-    isPending: isDeletingProject,
-    isError: isDeletingProjectError,
-  } = useDataMutation<DeleteRequest, SimpleResponse>(
-    "manager",
-    "/project/delete",
-    false,
-    {
-      invalidateKey: [["projects"]],
-      onSuccess: (data) => {
-        toast.success(data.message);
+  const { mutate: deleteProject, isPending: isDeletingProject } =
+    useDataMutation<DeleteRequest, SimpleResponse>(
+      "manager",
+      "/project/delete",
+      false,
+      {
+        invalidateKey: [["projects"]],
+        onSuccess: (data) => {
+          toast.success(data.message);
+        },
       },
-    },
-  );
+    );
 
-  if (
-    isLoadingTechnologies ||
-    isLoadingProjects ||
-    isCreatingProject ||
-    isUpdatingProject ||
-    isDeletingProject
-  ) {
+  if (isLoadingTechnologies || isLoadingProjects) {
     return <Loading content="projects" />;
   }
-
-  const isTechNotFoundError =
-    isTechnologiesFetchError &&
-    technologiesError &&
-    "status" in technologiesError &&
-    (technologiesError as FetchError).status === 404;
-  const hasTechError = isTechnologiesFetchError && !isTechNotFoundError;
-
-  const isProjNotFoundError =
-    isProjectsFetchError &&
-    projectsError &&
-    "status" in projectsError &&
-    (projectsError as FetchError).status === 404;
-  const hasProjError = isProjectsFetchError && !isProjNotFoundError;
+  const isTechnologiesEmpty = isNotFoundError(technologiesError);
+  const isProjectsEmpty = isNotFoundError(projectsError);
 
   if (
-    hasTechError ||
-    hasProjError ||
-    isCreatingProjectError ||
-    isUpdatingProjectError ||
-    isDeletingProjectError ||
-    (!technologies && !isTechNotFoundError) ||
-    (!projects && !isProjNotFoundError)
+    (technologiesError && !isTechnologiesEmpty) ||
+    (!technologies && !isTechnologiesEmpty) ||
+    (projectsError && !isProjectsEmpty) ||
+    (!projects && !isProjectsEmpty)
   ) {
-    return <Error content="projects" />;
+    return (
+      <Error
+        content="projects"
+        onRetry={() => {
+          void refetchTechnologies();
+          void refetchProjects();
+        }}
+      />
+    );
   }
 
-  const technologiesList = isTechNotFoundError
-    ? []
-    : technologies?.technologies || [];
-  const projectsList = isProjNotFoundError ? [] : projects?.projects || [];
+  const technologiesList = technologies?.technologies ?? [];
+  const projectsList = projects?.projects ?? [];
 
   return (
     <div className="mx-auto flex max-h-screen w-full flex-col gap-6 text-white">
@@ -142,7 +117,7 @@ export default function Projects() {
         <Form
           technologies={technologiesList}
           isCreatingProject={isCreatingProject}
-          mutateProjectAsync={createProjectAsync}
+          submitProject={createProjectAsync}
         />
       </div>
       <List
@@ -151,7 +126,7 @@ export default function Projects() {
         isUpdatingProject={isUpdatingProject}
         isDeletingProject={isDeletingProject}
         updateProjectAsync={updateProjectAsync}
-        deleteProjectAsync={deleteProjectAsync}
+        onDeleteProject={deleteProject}
       />
     </div>
   );

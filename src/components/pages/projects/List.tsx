@@ -1,6 +1,5 @@
 import {
   type Project,
-  type SimpleResponse,
   type ProjectUpdateRequest,
   type DeleteRequest,
   type Technology,
@@ -13,10 +12,8 @@ type ListProps = {
   projects: Project[];
   isUpdatingProject: boolean;
   isDeletingProject: boolean;
-  updateProjectAsync: (
-    request: ProjectUpdateRequest,
-  ) => Promise<SimpleResponse>;
-  deleteProjectAsync: (request: DeleteRequest) => Promise<SimpleResponse>;
+  updateProjectAsync: (request: ProjectUpdateRequest) => Promise<boolean>;
+  onDeleteProject: (request: DeleteRequest) => void;
 };
 
 export function List({
@@ -25,7 +22,7 @@ export function List({
   isUpdatingProject,
   isDeletingProject,
   updateProjectAsync,
-  deleteProjectAsync,
+  onDeleteProject,
 }: ListProps) {
   if (projects.length === 0) {
     return (
@@ -45,7 +42,7 @@ export function List({
           isUpdatingProject={isUpdatingProject}
           isDeletingProject={isDeletingProject}
           updateProjectAsync={updateProjectAsync}
-          deleteProjectAsync={deleteProjectAsync}
+          onDeleteProject={onDeleteProject}
         />
       ))}
     </div>

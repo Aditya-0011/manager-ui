@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 
 import { Edit2 } from "lucide-react";
@@ -7,7 +8,6 @@ import {
   TechnologyCategory,
   TechnologyCreateRequestSchema,
   TechnologyUpdateRequestSchema,
-  type SimpleResponse,
   type Technology,
   type TechnologyCreateRequest,
   type TechnologyUpdateRequest,
@@ -44,20 +44,17 @@ type FormProps =
       data: Technology;
       isCreating?: undefined;
       isUpdating: boolean;
-      mutateAsync: (
-        request: TechnologyUpdateRequest,
-      ) => Promise<SimpleResponse>;
+      submit: (request: TechnologyUpdateRequest) => Promise<boolean>;
     }
   | {
       data?: undefined;
       isCreating: boolean;
       isUpdating?: undefined;
-      mutateAsync: (
-        request: TechnologyCreateRequest,
-      ) => Promise<SimpleResponse>;
+      submit: (request: TechnologyCreateRequest) => Promise<boolean>;
     };
 
-export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
+export function Form({ data, isCreating, isUpdating, submit }: FormProps) {
+  const [open, setOpen] = useState(false);
   const formId = data ? `technology-form-${data.id}` : "technology-form-create";
 
   const defaultValues: TechnologyUpdateRequest | TechnologyCreateRequest = data
@@ -86,16 +83,26 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
         : TechnologyCreateRequestSchema,
     },
     onSubmit: async ({ value }) => {
-      if (data) {
-        await mutateAsync({ ...value, id: data.id } as TechnologyUpdateRequest);
-      } else {
-        await mutateAsync(value as TechnologyCreateRequest);
-      }
+      const saved = data
+        ? await submit({
+            ...value,
+            id: data.id,
+          } as TechnologyUpdateRequest)
+        : await submit(value as TechnologyCreateRequest);
+      if (!saved) return;
+      reset();
+      setOpen(false);
     },
   });
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) reset();
+      }}
+    >
       <form
         id={formId}
         onSubmit={(e) => {
@@ -108,6 +115,7 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
           render={
             data ? (
               <Button
+                aria-label={`Edit ${data.name}`}
                 variant="ghost"
                 size="icon-sm"
                 className="rounded-md text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
@@ -117,7 +125,7 @@ export function Form({ data, isCreating, isUpdating, mutateAsync }: FormProps) {
             )
           }
         >
-          {data ? <Edit2 className="size-4" /> : "Add"}
+          {data ? <Edit2 aria-hidden="true" /> : "Add"}
         </DialogTrigger>
         <DialogContent
           className="border border-white bg-neutral-950 sm:max-w-106.25"

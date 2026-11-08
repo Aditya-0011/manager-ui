@@ -1,11 +1,10 @@
 import { toast } from "sonner";
 
-import { useDataQuery, useDataMutation } from "@/api/handler";
+import { isNotFoundError, useDataQuery, useDataMutation } from "@/api/handler";
 import {
   type DeleteMessageRequest,
   type GetMessagesResponse,
   type SimpleResponse,
-  type FetchError,
 } from "@/lib/objects";
 
 import { List } from "@/components/pages/messages/List";
@@ -14,43 +13,31 @@ import { Loading } from "@/components/Loading";
 import { Error } from "@/components/Error";
 
 export default function Messages() {
-  const { data, isLoading, isError, error } = useDataQuery<
+  const { data, isLoading, error, refetch } = useDataQuery<
     null,
     GetMessagesResponse
   >("manager", ["messages"], "/message/list", false);
 
-  const {
-    mutateAsync,
-    isPending,
-    isError: deleteError,
-  } = useDataMutation<DeleteMessageRequest, SimpleResponse>(
-    "manager",
-    "/message/delete",
-    false,
-    {
-      invalidateKey: [["messages"]],
-      onSuccess: (data) => {
-        toast.success(data.message);
-      },
+  const { mutate: deleteMessage, isPending } = useDataMutation<
+    DeleteMessageRequest,
+    SimpleResponse
+  >("manager", "/message/delete", false, {
+    invalidateKey: [["messages"]],
+    onSuccess: (response) => {
+      toast.success(response.message);
     },
-  );
+  });
 
-  if (isLoading || isPending) {
+  if (isLoading) {
     return <Loading content="messages" />;
   }
 
-  const isNotFoundError =
-    isError &&
-    error &&
-    "status" in error &&
-    (error as FetchError).status === 404;
-  const hasError = (isError && !isNotFoundError) || deleteError;
-
-  if (hasError || (!data && !isNotFoundError)) {
-    return <Error content="messages" />;
+  const isEmpty = isNotFoundError(error);
+  if ((error && !isEmpty) || (!data && !isEmpty)) {
+    return <Error content="messages" onRetry={() => void refetch()} />;
   }
 
-  const messagesList = isNotFoundError ? [] : data?.messages || [];
+  const messagesList = data?.messages ?? [];
 
   return (
     <div className="mx-auto flex max-h-screen w-full flex-col gap-6 text-white">
@@ -64,7 +51,7 @@ export default function Messages() {
       <List
         data={messagesList}
         isDeleting={isPending}
-        mutateAsync={mutateAsync}
+        onDelete={deleteMessage}
       />
     </div>
   );

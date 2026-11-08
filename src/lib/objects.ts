@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { GrpcTimeSchema } from "@/lib/time";
 
 export const SimpleResponseSchema = z.object({
   message: z.string().trim(),
@@ -15,30 +16,24 @@ export const DeleteMessageRequestSchema = z.object({
 });
 export type DeleteMessageRequest = z.infer<typeof DeleteMessageRequestSchema>;
 
-export const RequestMethodSchema = z.enum(["GET", "POST"]);
-export type RequestMethod = z.infer<typeof RequestMethodSchema>;
-
-export const ServiceListSchema = z.enum(["auth", "manager"]);
-export type ServiceList = z.infer<typeof ServiceListSchema>;
-
-export const ServiceApiMappingSchema = z.record(ServiceListSchema, z.string());
-export type ServiceApiMapping = z.infer<typeof ServiceApiMappingSchema>;
+const HTTP_PROTOCOL = /^https?$/;
+const httpUrl = (error?: string) =>
+  z.url({ protocol: HTTP_PROTOCOL, error: error ?? "Must be an http(s) URL" });
+const isHttpUrl = (value: string) => httpUrl().safeParse(value).success;
 
 export const UserDetailsResponseSchema = z.object({
   about: z.string().trim(),
-  cover_image: z.url(),
-  updated_at: z.object({
-    seconds: z.number(),
-    nanos: z.number(),
-  }),
+  cover_image: httpUrl().or(z.literal("")),
+  updated_at: GrpcTimeSchema.optional(),
 });
 export type UserDetailsResponse = z.infer<typeof UserDetailsResponseSchema>;
 
 export const UserEditRequestSchema = z.object({
   about: z.string().trim(),
-  cover_image: z
-    .url()
-    .max(250, "Cover image url can be at most 250 characters long"),
+  cover_image: httpUrl().max(
+    250,
+    "Cover image url can be at most 250 characters long",
+  ),
 });
 export type UserEditRequest = z.infer<typeof UserEditRequestSchema>;
 
@@ -109,20 +104,17 @@ export const getTechnologyCategoryLabel = (
 const TechnologySummarySchema = z.object({
   id: z.number(),
   name: z.string(),
-  image_url: z.url(),
-  fallback_image_url: z.url(),
+  image_url: httpUrl(),
+  fallback_image_url: httpUrl(),
 });
 
 export const TechnologySchema = z.object({
   id: z.number(),
   name: z.string(),
-  image_url: z.url(),
-  fallback_image_url: z.url(),
+  image_url: httpUrl(),
+  fallback_image_url: httpUrl(),
   category: TechnologyCategorySchema,
-  updated_at: z.object({
-    seconds: z.number(),
-    nanos: z.number(),
-  }),
+  updated_at: GrpcTimeSchema,
 });
 export type Technology = z.infer<typeof TechnologySchema>;
 
@@ -144,13 +136,13 @@ export const TechnologyCreateRequestSchema = z.object({
     .trim()
     .min(1, { error: "Image URL is required" })
     .max(255, "Image Url can be at most 255 characters long")
-    .and(z.url("Must be a valid URL")),
+    .and(httpUrl("Must be a valid http(s) URL")),
   fallback_image_url: z
     .string()
     .trim()
     .min(1, { error: "Fallback image URL is required" })
     .max(255, "Fallback Image Url can be at most 255 characters long")
-    .and(z.url("Must be a valid URL")),
+    .and(httpUrl("Must be a valid http(s) URL")),
   category: TechnologyCategorySchema,
 });
 export type TechnologyCreateRequest = z.infer<
@@ -169,13 +161,13 @@ export const TechnologyUpdateRequestSchema = z.object({
     .trim()
     .min(1, { error: "Image URL is required" })
     .max(255, "Image Url can be at most 255 characters long")
-    .and(z.url("Must be a valid URL")),
+    .and(httpUrl("Must be a valid http(s) URL")),
   fallback_image_url: z
     .string()
     .trim()
     .min(1, { error: "Fallback image URL is required" })
     .max(255, "Fallback Image Url can be at most 255 characters long")
-    .and(z.url("Must be a valid URL")),
+    .and(httpUrl("Must be a valid http(s) URL")),
   category: TechnologyCategorySchema,
 });
 export type TechnologyUpdateRequest = z.infer<
@@ -191,15 +183,12 @@ export const ProjectSchema = z.object({
   id: z.number(),
   name: z.string(),
   description: z.string(),
-  image_url: z.url(),
-  project_url: z.url().optional(),
-  github_url: z.url().optional(),
+  image_url: httpUrl(),
+  project_url: httpUrl().optional(),
+  github_url: httpUrl().optional(),
   technologies: z.array(TechnologySummarySchema).optional(),
   featured: z.boolean(),
-  updated_at: z.object({
-    seconds: z.number(),
-    nanos: z.number(),
-  }),
+  updated_at: GrpcTimeSchema,
 });
 export type Project = z.infer<typeof ProjectSchema>;
 
@@ -220,12 +209,12 @@ export const ProjectCreateRequestSchema = z.object({
     .trim()
     .min(1, { error: "Image URL is required" })
     .max(255, "Image Url can be at most 255 characters long")
-    .and(z.url("Must be a valid URL")),
+    .and(httpUrl("Must be a valid http(s) URL")),
   project_url: z
     .string()
     .trim()
     .max(255, "Project Url can be at most 255 characters long")
-    .refine((val) => val === "" || z.url().safeParse(val).success, {
+    .refine((val) => val === "" || isHttpUrl(val), {
       message: "Must be a valid URL",
     })
     .optional(),
@@ -233,7 +222,7 @@ export const ProjectCreateRequestSchema = z.object({
     .string()
     .trim()
     .max(255, "Github Url can be at most 255 characters long")
-    .refine((val) => val === "" || z.url().safeParse(val).success, {
+    .refine((val) => val === "" || isHttpUrl(val), {
       message: "Must be a valid URL",
     })
     .optional(),
@@ -255,12 +244,12 @@ export const ProjectUpdateRequestSchema = z.object({
     .trim()
     .min(1, { error: "Image URL is required" })
     .max(255, "Image Url can be at most 255 characters long")
-    .and(z.url("Must be a valid URL")),
+    .and(httpUrl("Must be a valid http(s) URL")),
   project_url: z
     .string()
     .trim()
     .max(255, "Project Url can be at most 255 characters long")
-    .refine((val) => val === "" || z.url().safeParse(val).success, {
+    .refine((val) => val === "" || isHttpUrl(val), {
       message: "Must be a valid URL",
     })
     .optional(),
@@ -268,7 +257,7 @@ export const ProjectUpdateRequestSchema = z.object({
     .string()
     .trim()
     .max(255, "Github Url can be at most 255 characters long")
-    .refine((val) => val === "" || z.url().safeParse(val).success, {
+    .refine((val) => val === "" || isHttpUrl(val), {
       message: "Must be a valid URL",
     })
     .optional(),
@@ -338,10 +327,7 @@ export const ExperienceSchema = z.object({
   tenure: z.string(),
   positions: z.array(PositionSchema),
   technologies: z.array(TechnologySummarySchema),
-  updated_at: z.object({
-    seconds: z.number(),
-    nanos: z.number(),
-  }),
+  updated_at: GrpcTimeSchema,
 });
 export type Experience = z.infer<typeof ExperienceSchema>;
 
@@ -387,10 +373,4 @@ export type ExperienceUpdateRequest = z.infer<
   typeof ExperienceUpdateRequestSchema
 >;
 
-export class FetchError extends Error {
-  status: number;
-  constructor(message: string, status: number) {
-    super(message);
-    this.status = status;
-  }
-}
+export { FetchError } from "@/lib/errors";

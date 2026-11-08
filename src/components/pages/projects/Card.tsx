@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { Link } from "react-router";
 
 import ReactMarkdown from "react-markdown";
 
@@ -9,7 +8,6 @@ import { Github } from "@/lib/brand-icons";
 
 import {
   type Project,
-  type SimpleResponse,
   type ProjectUpdateRequest,
   type DeleteRequest,
   type Technology,
@@ -35,8 +33,8 @@ type CardProps = {
   technologies: Technology[];
   isUpdatingProject: boolean;
   isDeletingProject: boolean;
-  updateProjectAsync: (req: ProjectUpdateRequest) => Promise<SimpleResponse>;
-  deleteProjectAsync: (req: DeleteRequest) => Promise<SimpleResponse>;
+  updateProjectAsync: (req: ProjectUpdateRequest) => Promise<boolean>;
+  onDeleteProject: (req: DeleteRequest) => void;
 };
 
 const ProjectCard = memo(
@@ -46,7 +44,7 @@ const ProjectCard = memo(
     isUpdatingProject,
     isDeletingProject,
     updateProjectAsync,
-    deleteProjectAsync,
+    onDeleteProject,
   }: CardProps) => {
     return (
       <Card className="group bg-muted/5 hover:bg-muted/50 mb-4 break-inside-avoid ring ring-white/10 backdrop-blur transition-all contain-content hover:scale-[1.01] hover:ring-white">
@@ -77,14 +75,17 @@ const ProjectCard = memo(
                   size="icon-sm"
                   className="hover:text-blue-600"
                   title={project.github_url}
+                  aria-label={`GitHub repository: ${project.name}`}
+                  nativeButton={false}
+                  render={
+                    <a
+                      href={project.github_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  }
                 >
-                  <Link
-                    to={project.github_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Github />
-                  </Link>
+                  <Github />
                 </Button>
               )}
               {project.project_url && (
@@ -93,14 +94,17 @@ const ProjectCard = memo(
                   size="icon-sm"
                   className="hover:text-blue-600"
                   title={project.project_url}
+                  aria-label={`Live project: ${project.name}`}
+                  nativeButton={false}
+                  render={
+                    <a
+                      href={project.project_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  }
                 >
-                  <Link
-                    to={project.project_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Globe />
-                  </Link>
+                  <Globe aria-hidden="true" />
                 </Button>
               )}
             </div>
@@ -183,14 +187,14 @@ const ProjectCard = memo(
               technologies={technologies}
               project={project}
               isUpdatingProject={isUpdatingProject}
-              mutateProjectAsync={updateProjectAsync}
+              submitProject={updateProjectAsync}
             />
             <Delete
               id={project.id}
               description="This action cannot be undone. This will delete the project"
               name={project.name}
               isDeleting={isDeletingProject}
-              mutateAsync={deleteProjectAsync}
+              onDelete={onDeleteProject}
             />
           </div>
         </CardFooter>

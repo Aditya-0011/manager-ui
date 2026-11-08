@@ -9,10 +9,7 @@ import {
   LogOut,
 } from "lucide-react";
 
-import { useDataMutation } from "@/api/handler";
-import { useAuth } from "@/contexts/AuthContext";
-
-import { type SimpleResponse } from "@/lib/objects";
+import { useLogout } from "@/hooks/use-logout";
 
 import {
   Sidebar,
@@ -26,13 +23,13 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-type navigationOptions = {
+type NavigationOption = {
   title: string;
   url: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 };
 
-const items: navigationOptions[] = [
+const items: NavigationOption[] = [
   { title: "About", url: "/about", icon: User },
   { title: "Technologies", url: "/technologies", icon: Code2 },
   { title: "Projects", url: "/projects", icon: FolderCode },
@@ -41,24 +38,8 @@ const items: navigationOptions[] = [
 ];
 
 export function Navigation() {
-  const { logout } = useAuth();
   const { pathname } = useLocation();
-
-  const { mutateAsync, isPending } = useDataMutation<null, SimpleResponse>(
-    "auth",
-    "/logout",
-    false,
-    {
-      invalidateKey: [["userDetails"]],
-      onSuccess: () => {
-        logout();
-      },
-    },
-  );
-
-  async function handleLogout() {
-    await mutateAsync(null);
-  }
+  const { logout, isPending } = useLogout();
 
   return (
     <Sidebar
@@ -73,23 +54,24 @@ export function Navigation() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton
                     tooltip={item.title}
+                    isActive={pathname === item.url}
                     className="gap-4 text-base hover:bg-neutral-800"
                     render={
-                      pathname === item.url ? (
-                        <button
-                          type="button"
-                          aria-label={item.title}
-                          disabled
-                        />
-                      ) : (
-                        <Link to={item.url} />
-                      )
+                      <Link
+                        to={item.url}
+                        aria-current={
+                          pathname === item.url ? "page" : undefined
+                        }
+                      />
                     }
                   >
-                    <item.icon className="size-10 text-sky-500" />
+                    <item.icon
+                      aria-hidden="true"
+                      className="size-10 text-sky-500"
+                    />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -104,11 +86,11 @@ export function Navigation() {
             <SidebarMenuButton
               tooltip="Logout"
               className="gap-3 text-base text-red-500 hover:bg-red-500/10 hover:text-red-600 hover:ring hover:ring-red-500"
-              onClick={handleLogout}
+              onClick={logout}
               disabled={isPending}
             >
-              <LogOut className="size-10" />
-              {isPending ? "Logging out..." : "Logout"}
+              <LogOut aria-hidden="true" className="size-10" />
+              <span>{isPending ? "Logging out..." : "Logout"}</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

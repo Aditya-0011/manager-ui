@@ -27,7 +27,7 @@ import { Button } from "@/components/ui/button";
 import { UpdatedOn } from "@/components/pages/UpdatedOn";
 
 export function Form({ data }: { data: UserDetailsResponse }) {
-  const { mutateAsync, isPending } = useDataMutation<
+  const { submit, isPending } = useDataMutation<
     UserEditRequest,
     SimpleResponse
   >("manager", "/user/edit", false, {
@@ -46,7 +46,7 @@ export function Form({ data }: { data: UserDetailsResponse }) {
       onSubmit: UserEditRequestSchema,
     },
     onSubmit: async ({ value }) => {
-      await mutateAsync(value);
+      await submit(value);
     },
   });
 
@@ -57,14 +57,14 @@ export function Form({ data }: { data: UserDetailsResponse }) {
           <h1 className="text-3xl font-semibold">About</h1>
           {data?.updated_at && <UpdatedOn value={data.updated_at} />}
         </div>
-          <Button
-            form="about-form"
-            type="submit"
-            className="rounded-md bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500"
-            disabled={isPending}
-          >
-            {isPending ? "Saving..." : "Save"}
-          </Button>
+        <Button
+          form="about-form"
+          type="submit"
+          className="rounded-md bg-sky-500 hover:bg-neutral-950 hover:text-sky-500 hover:ring hover:ring-sky-500"
+          disabled={isPending}
+        >
+          {isPending ? "Saving..." : "Save"}
+        </Button>
       </div>
 
       <form
@@ -143,12 +143,7 @@ export function Form({ data }: { data: UserDetailsResponse }) {
                                 start={start ?? undefined}
                                 type={
                                   type as
-                                    | "1"
-                                    | "a"
-                                    | "A"
-                                    | "i"
-                                    | "I"
-                                    | undefined
+                                    "1" | "a" | "A" | "i" | "I" | undefined
                                 }
                               >
                                 {children}

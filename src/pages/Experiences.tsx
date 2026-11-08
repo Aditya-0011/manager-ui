@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 
-import { useDataQuery, useDataMutation } from "@/api/handler";
+import { isNotFoundError, useDataQuery, useDataMutation } from "@/api/handler";
 
 import {
   type DeleteRequest,
@@ -10,7 +10,6 @@ import {
   type GetExperiencesResponse,
   type ExperienceCreateRequest,
   type ExperienceUpdateRequest,
-  type FetchError,
 } from "@/lib/objects";
 
 import { Form } from "@/components/pages/experiences/Form";
@@ -23,8 +22,8 @@ export default function Experiences() {
   const {
     data: technologies,
     isLoading: isLoadingTechnologies,
-    isError: isTechnologiesFetchError,
     error: technologiesError,
+    refetch: refetchTechnologies,
   } = useDataQuery<null, GetTechnologiesResponse>(
     "manager",
     ["technologies"],
@@ -35,8 +34,8 @@ export default function Experiences() {
   const {
     data: projects,
     isLoading: isLoadingProjects,
-    isError: isProjectsFetchError,
     error: projectsError,
+    refetch: refetchProjects,
   } = useDataQuery<null, GetProjectsResponse>(
     "manager",
     ["projects"],
@@ -47,8 +46,8 @@ export default function Experiences() {
   const {
     data: experiences,
     isLoading: isLoadingExperiences,
-    isError: isExperiencesFetchError,
     error: experiencesError,
+    refetch: refetchExperiences,
   } = useDataQuery<null, GetExperiencesResponse>(
     "manager",
     ["experiences"],
@@ -56,107 +55,75 @@ export default function Experiences() {
     false,
   );
 
-  const {
-    mutateAsync: createExperienceAsync,
-    isPending: isCreatingExperience,
-    isError: isCreatingExperienceError,
-  } = useDataMutation<ExperienceCreateRequest, SimpleResponse>(
-    "manager",
-    "/experience/add",
-    false,
-    {
-      invalidateKey: [["experiences"]],
-      onSuccess: (data) => {
-        toast.success(data.message);
+  const { submit: createExperienceAsync, isPending: isCreatingExperience } =
+    useDataMutation<ExperienceCreateRequest, SimpleResponse>(
+      "manager",
+      "/experience/add",
+      false,
+      {
+        invalidateKey: [["experiences"]],
+        onSuccess: (data) => {
+          toast.success(data.message);
+        },
       },
-    },
-  );
+    );
 
-  const {
-    mutateAsync: updateExperienceAsync,
-    isPending: isUpdatingExperience,
-    isError: isUpdatingExperienceError,
-  } = useDataMutation<ExperienceUpdateRequest, SimpleResponse>(
-    "manager",
-    "/experience/edit",
-    false,
-    {
-      invalidateKey: [["experiences"]],
-      onSuccess: (data) => {
-        toast.success(data.message);
+  const { submit: updateExperienceAsync, isPending: isUpdatingExperience } =
+    useDataMutation<ExperienceUpdateRequest, SimpleResponse>(
+      "manager",
+      "/experience/edit",
+      false,
+      {
+        invalidateKey: [["experiences"]],
+        onSuccess: (data) => {
+          toast.success(data.message);
+        },
       },
-    },
-  );
+    );
 
-  const {
-    mutateAsync: deleteExperienceAsync,
-    isPending: isDeletingExperience,
-    isError: isDeletingExperienceError,
-  } = useDataMutation<DeleteRequest, SimpleResponse>(
-    "manager",
-    "/experience/delete",
-    false,
-    {
-      invalidateKey: [["experiences"]],
-      onSuccess: (data) => {
-        toast.success(data.message);
+  const { mutate: deleteExperience, isPending: isDeletingExperience } =
+    useDataMutation<DeleteRequest, SimpleResponse>(
+      "manager",
+      "/experience/delete",
+      false,
+      {
+        invalidateKey: [["experiences"]],
+        onSuccess: (data) => {
+          toast.success(data.message);
+        },
       },
-    },
-  );
+    );
 
-  if (
-    isLoadingTechnologies ||
-    isLoadingProjects ||
-    isLoadingExperiences ||
-    isCreatingExperience ||
-    isUpdatingExperience ||
-    isDeletingExperience
-  ) {
+  if (isLoadingTechnologies || isLoadingProjects || isLoadingExperiences) {
     return <Loading content="experiences" />;
   }
-
-  const isTechNotFoundError =
-    isTechnologiesFetchError &&
-    technologiesError &&
-    "status" in technologiesError &&
-    (technologiesError as FetchError).status === 404;
-  const hasTechError = isTechnologiesFetchError && !isTechNotFoundError;
-
-  const isProjNotFoundError =
-    isProjectsFetchError &&
-    projectsError &&
-    "status" in projectsError &&
-    (projectsError as FetchError).status === 404;
-  const hasProjError = isProjectsFetchError && !isProjNotFoundError;
-
-  const isExpNotFoundError =
-    isExperiencesFetchError &&
-    experiencesError &&
-    "status" in experiencesError &&
-    (experiencesError as FetchError).status === 404;
-  const hasExpError = isExperiencesFetchError && !isExpNotFoundError;
+  const isTechnologiesEmpty = isNotFoundError(technologiesError);
+  const isProjectsEmpty = isNotFoundError(projectsError);
+  const isExperiencesEmpty = isNotFoundError(experiencesError);
 
   if (
-    hasTechError ||
-    hasProjError ||
-    hasExpError ||
-    isCreatingExperienceError ||
-    isUpdatingExperienceError ||
-    isDeletingExperienceError ||
-    (!technologies && !isTechNotFoundError) ||
-    (!projects && !isProjNotFoundError) ||
-    (!experiences && !isExpNotFoundError)
+    (technologiesError && !isTechnologiesEmpty) ||
+    (!technologies && !isTechnologiesEmpty) ||
+    (projectsError && !isProjectsEmpty) ||
+    (!projects && !isProjectsEmpty) ||
+    (experiencesError && !isExperiencesEmpty) ||
+    (!experiences && !isExperiencesEmpty)
   ) {
-    return <Error content="experiences" />;
+    return (
+      <Error
+        content="experiences"
+        onRetry={() => {
+          void refetchTechnologies();
+          void refetchProjects();
+          void refetchExperiences();
+        }}
+      />
+    );
   }
 
-  const technologiesList = isTechNotFoundError
-    ? []
-    : technologies?.technologies || [];
-  const projectsList = isProjNotFoundError ? [] : projects?.projects || [];
-  const experiencesList = isExpNotFoundError
-    ? []
-    : experiences?.experiences || [];
+  const technologiesList = technologies?.technologies ?? [];
+  const projectsList = projects?.projects ?? [];
+  const experiencesList = experiences?.experiences ?? [];
 
   return (
     <div className="mx-auto flex max-h-screen w-full flex-col gap-6 text-white">
@@ -172,7 +139,7 @@ export default function Experiences() {
             technologies={technologiesList}
             projects={projectsList}
             isCreatingExperience={isCreatingExperience}
-            mutateExperienceAsync={createExperienceAsync}
+            submitExperience={createExperienceAsync}
           />
         </div>
       </div>
@@ -183,7 +150,7 @@ export default function Experiences() {
         isUpdatingExperience={isUpdatingExperience}
         isDeletingExperience={isDeletingExperience}
         updateExperienceAsync={updateExperienceAsync}
-        deleteExperienceAsync={deleteExperienceAsync}
+        onDeleteExperience={deleteExperience}
       />
     </div>
   );

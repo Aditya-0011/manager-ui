@@ -8,7 +8,6 @@ import { Edit2, Projector } from "lucide-react";
 import {
   ProjectCreateRequestSchema,
   ProjectUpdateRequestSchema,
-  type SimpleResponse,
   type Technology,
   type Project,
   type ProjectCreateRequest,
@@ -41,8 +40,8 @@ import {
   ComboboxItem,
   ComboboxList,
   ComboboxValue,
-  useComboboxAnchor,
 } from "@/components/ui/combobox";
+import { useComboboxAnchor } from "@/hooks/use-combobox-anchor";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -54,18 +53,14 @@ type FormProps =
       project: Project;
       isCreatingProject?: undefined;
       isUpdatingProject: boolean;
-      mutateProjectAsync: (
-        request: ProjectUpdateRequest,
-      ) => Promise<SimpleResponse>;
+      submitProject: (request: ProjectUpdateRequest) => Promise<boolean>;
     }
   | {
       technologies: Technology[];
       project?: undefined;
       isCreatingProject: boolean;
       isUpdatingProject?: undefined;
-      mutateProjectAsync: (
-        request: ProjectCreateRequest,
-      ) => Promise<SimpleResponse>;
+      submitProject: (request: ProjectCreateRequest) => Promise<boolean>;
     };
 
 export function Form({
@@ -73,8 +68,9 @@ export function Form({
   project,
   isCreatingProject,
   isUpdatingProject,
-  mutateProjectAsync,
+  submitProject,
 }: FormProps) {
+  const [open, setOpen] = useState(false);
   const formId = project ? `project-form-${project.id}` : "project-form-create";
 
   const defaultValues: ProjectUpdateRequest | ProjectCreateRequest = project
@@ -117,14 +113,15 @@ export function Form({
         github_url: value.github_url === "" ? undefined : value.github_url,
       };
 
-      if (project) {
-        await mutateProjectAsync({
-          ...payload,
-          id: project.id,
-        } as ProjectUpdateRequest);
-      } else {
-        await mutateProjectAsync(payload as ProjectCreateRequest);
-      }
+      const saved = project
+        ? await submitProject({
+            ...payload,
+            id: project.id,
+          } as ProjectUpdateRequest)
+        : await submitProject(payload as ProjectCreateRequest);
+      if (!saved) return;
+      reset();
+      setOpen(false);
     },
   });
 
@@ -133,7 +130,13 @@ export function Form({
   const [preview, setPreview] = useState<boolean>(false);
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) reset();
+      }}
+    >
       <form
         id={formId}
         onSubmit={(e) => {
@@ -146,6 +149,7 @@ export function Form({
           render={
             project ? (
               <Button
+                aria-label={`Edit ${project.name}`}
                 variant="ghost"
                 size="icon-sm"
                 className="rounded-md text-blue-500 hover:bg-blue-500/10 hover:text-blue-600 hover:ring hover:ring-blue-500"
@@ -155,7 +159,7 @@ export function Form({
             )
           }
         >
-          {project ? <Edit2 className="size-4" /> : "Add"}
+          {project ? <Edit2 aria-hidden="true" /> : "Add"}
         </DialogTrigger>
         <DialogContent
           className="border border-white bg-neutral-950 sm:max-w-200"
@@ -249,12 +253,7 @@ export function Form({
                                 start={start ?? undefined}
                                 type={
                                   type as
-                                    | "1"
-                                    | "a"
-                                    | "A"
-                                    | "i"
-                                    | "I"
-                                    | undefined
+                                    "1" | "a" | "A" | "i" | "I" | undefined
                                 }
                               >
                                 {children}
