@@ -24,6 +24,7 @@ const isHttpUrl = (value: string) => httpUrl().safeParse(value).success;
 export const UserDetailsResponseSchema = z.object({
   about: z.string().trim(),
   cover_image: httpUrl().or(z.literal("")),
+  chat_model: z.string().optional(),
   updated_at: GrpcTimeSchema.optional(),
 });
 export type UserDetailsResponse = z.infer<typeof UserDetailsResponseSchema>;
@@ -34,7 +35,13 @@ export const UserEditRequestSchema = z.object({
     250,
     "Cover image url can be at most 250 characters long",
   ),
+  chat_model: z.string().max(100),
 });
+
+export const GetChatModelsResponseSchema = z.object({
+  models: z.array(z.object({ id: z.string(), name: z.string() })).optional(),
+});
+export type GetChatModelsResponse = z.infer<typeof GetChatModelsResponseSchema>;
 export type UserEditRequest = z.infer<typeof UserEditRequestSchema>;
 
 const MessageSchema = z.object({

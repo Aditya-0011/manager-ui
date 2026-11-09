@@ -4,9 +4,10 @@ import ReactMarkdown from "react-markdown";
 
 import { toast } from "sonner";
 
-import { useDataMutation } from "@/api/handler";
+import { useDataMutation, useDataQuery } from "@/api/handler";
 import {
   UserEditRequestSchema,
+  type GetChatModelsResponse,
   type UserEditRequest,
   type SimpleResponse,
   type UserDetailsResponse,
@@ -19,6 +20,13 @@ import {
   FieldError,
 } from "@/components/ui/field";
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -26,7 +34,16 @@ import { Button } from "@/components/ui/button";
 
 import { UpdatedOn } from "@/components/pages/UpdatedOn";
 
+const CHAT_OFF = "off";
+
 export function Form({ data }: { data: UserDetailsResponse }) {
+  const chatModels = useDataQuery<null, GetChatModelsResponse>(
+    "manager",
+    ["chatModels"],
+    "/chat/models",
+    false,
+  );
+
   const { submit, isPending } = useDataMutation<
     UserEditRequest,
     SimpleResponse
@@ -41,6 +58,7 @@ export function Form({ data }: { data: UserDetailsResponse }) {
     defaultValues: {
       about: data?.about ?? "",
       cover_image: data?.cover_image ?? "",
+      chat_model: data?.chat_model ?? "",
     },
     validators: {
       onSubmit: UserEditRequestSchema,
@@ -49,6 +67,19 @@ export function Form({ data }: { data: UserDetailsResponse }) {
       await submit(value);
     },
   });
+
+  const savedModel = data?.chat_model ?? "";
+  const freeModels = chatModels.data?.models ?? [];
+  const modelOptions = [
+    { value: CHAT_OFF, label: "Chatbot off" },
+    ...freeModels.map(({ id, name }) => ({
+      value: id,
+      label: `${name} (${id})`,
+    })),
+    ...(savedModel && !freeModels.some(({ id }) => id === savedModel)
+      ? [{ value: savedModel, label: `${savedModel} (not in free list)` }]
+      : []),
+  ];
 
   return (
     <div className="mx-auto flex max-h-screen w-full flex-col gap-6 text-white">
@@ -250,6 +281,49 @@ export function Form({ data }: { data: UserDetailsResponse }) {
                 </div>
               )}
             />
+          </div>
+
+          <div className="flex flex-col gap-2 rounded-xl bg-neutral-950/70 p-4 md:p-6">
+            <FormField
+              name="chat_model"
+              children={(field) => (
+                <Field>
+                  <FieldLabel htmlFor={field.name}>Chatbot Model</FieldLabel>
+                  <Select
+                    items={modelOptions}
+                    value={field.state.value || CHAT_OFF}
+                    onValueChange={(value) => {
+                      if (value === null) return;
+                      field.handleChange(value === CHAT_OFF ? "" : value);
+                    }}
+                    disabled={isPending}
+                  >
+                    <SelectTrigger
+                      id={field.name}
+                      className="border-input w-full rounded-md border bg-neutral-950 focus-visible:border-sky-500 focus-visible:ring-0 focus-visible:ring-sky-500 md:max-w-md"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="border-input rounded-md border px-1 py-2">
+                      {modelOptions.map((option) => (
+                        <SelectItem
+                          key={option.value}
+                          value={option.value}
+                          className="rounded-md"
+                        >
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              )}
+            />
+            <p className="text-muted-foreground text-xs">
+              {chatModels.isError
+                ? "Could not load the free model list right now."
+                : "Only models that are free right now are listed. Changes reach the site within about a minute."}
+            </p>
           </div>
         </FieldGroup>
       </form>

@@ -36,6 +36,7 @@ This section outlines the capabilities of the manager UI.
 - **Design**: Built using `@base-ui/react` and Tailwind CSS, with a dark-only theme.
 - **Reactive data**: Uses TanStack Query to provide caching, background data synchronization, and invalidation after mutations.
 - **Search**: Client-side search on the Technologies and Projects lists.
+- **Chatbot model**: A dropdown on the About page picks which free AI Gateway model the Portfolio chat uses, or turns the chat off.
 - **Type-safe validation**: Forms and API responses validate strictly on the client side using `zod`.
 
 ## Platform routing
