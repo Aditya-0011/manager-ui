@@ -2,7 +2,7 @@
 
 The portfolio content editor dashboard for the platform.
 
-[![React Version](https://img.shields.io/badge/React-19.2-61DAFB?style=flat-square&logo=react)](https://react.dev/)
+[![React Version](https://img.shields.io/badge/React-19.3-61DAFB?style=flat-square&logo=react)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-Build-646CFF?style=flat-square&logo=vite)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4.3-38B2AC?style=flat-square&logo=tailwind-css)](https://tailwindcss.com/)
 
@@ -33,8 +33,9 @@ This section explains the technologies and physical layout of the manager UI.
 This section outlines the capabilities of the manager UI.
 
 - **Performance**: Bootstrapped with Vite and React 19 Compiler plugins for rendering performance.
-- **Design**: Built using `@base-ui/react` and Tailwind CSS, with dynamic theming support.
-- **Reactive data**: Uses TanStack Query to provide optimistic updates, caching, and background data synchronization.
+- **Design**: Built using `@base-ui/react` and Tailwind CSS, with a dark-only theme.
+- **Reactive data**: Uses TanStack Query to provide caching, background data synchronization, and invalidation after mutations.
+- **Search**: Client-side search on the Technologies and Projects lists.
 - **Type-safe validation**: Forms and API responses validate strictly on the client side using `zod`.
 
 ## Platform routing
@@ -64,7 +65,6 @@ Export these variables directly in your shell environment:
 | `VITE_AUTH_API_URL` | Endpoint for the public auth API routes | **Yes** |
 | `VITE_MANAGER_API_URL` | Endpoint for the public manager API routes | **Yes** |
 | `VITE_CONSOLE_URL` | Base URL of the deployed console UI | **Yes** |
-| `Development` | Boolean flag setting the environment to development mode | No |
 
 ### Running locally
 

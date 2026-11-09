@@ -35,9 +35,11 @@ export function List({
           className="bg-muted/5 hover:bg-muted/50 mb-4 break-inside-avoid py-3 ring ring-white/10 backdrop-blur transition-all hover:scale-[1.01] hover:ring-white"
         >
           <CardHeader className="flex flex-row items-start justify-between gap-4 pb-2">
-            <div>
+            <div className="min-w-0">
               <CardTitle className="text-lg leading-tight">{name}</CardTitle>
-              <CardDescription className="text-xs">{email}</CardDescription>
+              <CardDescription className="text-xs wrap-anywhere">
+                {email}
+              </CardDescription>
             </div>
             <Delete
               id={id}

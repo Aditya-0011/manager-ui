@@ -183,7 +183,7 @@ export function Form({
                 : "Try not to put any typos!"}
             </DialogDescription>
           </DialogHeader>
-          <FieldGroup className="no-scrollbar mt-1 max-h-[75vh] overflow-y-auto">
+          <FieldGroup className="no-scrollbar mt-1 sm:max-h-[75vh] sm:overflow-y-auto">
             <FormField
               name="name"
               children={(field) => {
