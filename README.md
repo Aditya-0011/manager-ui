@@ -36,14 +36,14 @@ This section outlines the capabilities of the manager UI.
 - **Design**: Built using `@base-ui/react` and Tailwind CSS, with a dark-only theme.
 - **Reactive data**: Uses TanStack Query to provide caching, background data synchronization, and invalidation after mutations.
 - **Search**: Client-side search on the Technologies and Projects lists.
-- **Chatbot model**: A dropdown on the About page picks which free AI Gateway model the Portfolio chat uses, or turns the chat off.
+- **Chatbot model**: A dropdown on the About page picks which AI Gateway model the Portfolio chat uses, or turns the chat off.
 - **Type-safe validation**: Forms and API responses validate strictly on the client side using `zod`.
 
 ## Platform routing
 
 The manager dashboard is structured around the core entities of a portfolio:
 
-- `/about`: Update the core profile and cover images
+- `/about`: Update the core profile, cover images, and chatbot model
 - `/technologies`: Manage the taxonomy of the tech stack
 - `/projects`: Add and edit showcase projects
 - `/experiences`: Visually map the timeline of companies and nested job positions

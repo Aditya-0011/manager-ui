@@ -69,15 +69,15 @@ export function Form({ data }: { data: UserDetailsResponse }) {
   });
 
   const savedModel = data?.chat_model ?? "";
-  const freeModels = chatModels.data?.models ?? [];
+  const availableModels = chatModels.data?.models ?? [];
   const modelOptions = [
     { value: CHAT_OFF, label: "Chatbot off" },
-    ...freeModels.map(({ id, name }) => ({
+    ...availableModels.map(({ id, name }) => ({
       value: id,
       label: `${name} (${id})`,
     })),
-    ...(savedModel && !freeModels.some(({ id }) => id === savedModel)
-      ? [{ value: savedModel, label: `${savedModel} (not in free list)` }]
+    ...(savedModel && !availableModels.some(({ id }) => id === savedModel)
+      ? [{ value: savedModel, label: `${savedModel} (not in list)` }]
       : []),
   ];
 
@@ -321,8 +321,8 @@ export function Form({ data }: { data: UserDetailsResponse }) {
             />
             <p className="text-muted-foreground text-xs">
               {chatModels.isError
-                ? "Could not load the free model list right now."
-                : "Only models that are free right now are listed. Changes reach the site within about a minute."}
+                ? "Could not load the model list right now."
+                : "Changes reach the site within about a minute."}
             </p>
           </div>
         </FieldGroup>
